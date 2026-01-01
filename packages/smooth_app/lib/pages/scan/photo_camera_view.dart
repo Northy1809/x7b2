@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_app/services/live_barcode_reader.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// Lets the scan page take a picture and switch the torch of a
@@ -14,6 +16,13 @@ class PhotoCameraHandle {
   Future<XFile?> takePicture() async => _view?._takePicture();
 
   Future<void> toggleTorch() async => _view?._toggleTorch();
+
+  /// 25/11: a barcode read from the live picture (see [LiveBarcodeReader]),
+  /// before the shutter is pressed. Called once; again after [rearm].
+  void Function(String code)? onBarcode;
+
+  /// Reads live barcodes again (after a result was closed).
+  void rearm() => _view?._live.start();
 
   /// Stops the camera so another view can take it.
   Future<void> release() async => _view?._stop();
@@ -39,6 +48,8 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
   bool _visible = false;
   bool _busy = false;
   String? _error;
+  late final LiveBarcodeReader _live = LiveBarcodeReader(onCode: (String code) => widget.handle.onBarcode?.call(code));
+  bool _streaming = false;
 
   @override
   void initState() {
@@ -92,7 +103,8 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
         // than that the lens cannot focus.
         ResolutionPreset.max,
         enableAudio: false,
-        imageFormatGroup: ImageFormatGroup.jpeg,
+        // 25/11: frames the barcode reader can use; photos stay JPEG.
+        imageFormatGroup: Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.yuv420,
       );
       await controller.initialize();
       if (!mounted || !_visible) {
@@ -109,6 +121,8 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
         _controller = controller;
         _error = null;
       });
+      await _live.start();
+      await _startStream();
     } catch (e) {
       if (mounted) {
         setState(() => _error = 'The camera could not start.');
@@ -129,7 +143,31 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
       _controller = null;
     }
     widget.handle.torch.value = null;
+    _live.stop();
+    _streaming = false;
     await controller.dispose();
+  }
+
+  Future<void> _startStream() async {
+    final CameraController? controller = _controller;
+    if (controller == null || _streaming || !controller.value.isInitialized) {
+      return;
+    }
+    try {
+      await controller.startImageStream(_live.onFrame);
+      _streaming = true;
+    } catch (_) {}
+  }
+
+  Future<void> _stopStream() async {
+    final CameraController? controller = _controller;
+    if (controller == null || !_streaming) {
+      return;
+    }
+    _streaming = false;
+    try {
+      await controller.stopImageStream();
+    } catch (_) {}
   }
 
   Future<XFile?> _takePicture() async {
@@ -139,10 +177,15 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
         controller.value.isTakingPicture) {
       return null;
     }
+    // The photo is taken with the frame stream paused (iOS cannot always
+    // do both), which then runs on.
+    await _stopStream();
     try {
       return await controller.takePicture();
     } catch (_) {
       return null;
+    } finally {
+      unawaited(_startStream());
     }
   }
 

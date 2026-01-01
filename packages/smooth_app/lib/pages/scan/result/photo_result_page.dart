@@ -33,8 +33,12 @@ class PhotoResultPage extends StatefulWidget {
     this.countryTags,
     this.minAnalyzing = const Duration(milliseconds: 1600),
     this.analysis,
+    this.barcode,
     super.key,
   });
+
+  /// A barcode the live camera read already.
+  final String? barcode;
 
   final String imagePath;
 
@@ -53,11 +57,11 @@ class PhotoResultPage extends StatefulWidget {
   final PhotoAnalyzer? analyzer;
   final Future<EthicsDb> Function()? ethicsDb;
 
-  static Route<void> route({required final String imagePath, final PhotoAnalysis? analysis}) =>
+  static Route<void> route({required final String imagePath, final PhotoAnalysis? analysis, final String? barcode}) =>
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 160),
         reverseTransitionDuration: const Duration(milliseconds: 220),
-        pageBuilder: (_, _, _) => PhotoResultPage(imagePath: imagePath, analysis: analysis),
+        pageBuilder: (_, _, _) => PhotoResultPage(imagePath: imagePath, analysis: analysis, barcode: barcode),
         transitionsBuilder: (_, Animation<double> a, _, Widget child) =>
             FadeTransition(opacity: a, child: child),
       );
@@ -87,7 +91,7 @@ class _PhotoResultPageState extends State<PhotoResultPage> {
     final PhotoAnalyzer analyzer = widget.analyzer ?? PhotoAnalyzer();
     final Future<EthicsDb> ethics = (widget.ethicsDb ?? EthicsDb.load)();
     final Future<void> minimum = Future<void>.delayed(widget.analysis == null ? widget.minAnalyzing : Duration.zero);
-    final PhotoAnalysis analysis = widget.analysis ?? await analyzer.analyze(widget.imagePath, countryTags: countries);
+    final PhotoAnalysis analysis = widget.analysis ?? await analyzer.analyze(widget.imagePath, countryTags: countries, liveBarcode: widget.barcode);
     EthicsDb? db;
     try {
       db = await ethics;

@@ -85,7 +85,37 @@ class _ScanPageState extends State<ScanPage> {
   bool _busy = false;
 
   @override
+  void initState() {
+    super.initState();
+    _camera.onBarcode = _liveBarcode;
+  }
+
+  /// 25/11: the live picture read a barcode: the photo is taken by itself
+  /// and the product opens, no shutter needed.
+  Future<void> _liveBarcode(final String code) async {
+    if (_busy || !mounted) {
+      _camera.rearm();
+      return;
+    }
+    _busy = true;
+    try {
+      Haptics.shutter();
+      debugPrint('OWNED_SCAN live barcode=$code');
+      final XFile? file = await _camera.takePicture();
+      if (file != null) {
+        await _open(file.path, barcode: code);
+      }
+    } finally {
+      _busy = false;
+      if (mounted) {
+        _camera.rearm();
+      }
+    }
+  }
+
+  @override
   void dispose() {
+    _camera.onBarcode = null;
     _camera.dispose();
     super.dispose();
   }
@@ -93,17 +123,17 @@ class _ScanPageState extends State<ScanPage> {
   /// As Cal AI: the camera closes and the photo is read in a row at the
   /// top of the home page. Opened as a tab (no route below), the answer
   /// sheet opens over the camera instead.
-  Future<void> _open(final String path) async {
+  Future<void> _open(final String path, {final String? barcode}) async {
     if (!mounted) {
       return;
     }
     final NavigatorState navigator = Navigator.of(context);
     if (navigator.canPop()) {
-      PendingScans.instance.start(path);
+      PendingScans.instance.start(path, barcode: barcode);
       navigator.pop();
       return;
     }
-    await navigator.push<void>(PhotoResultPage.route(imagePath: path));
+    await navigator.push<void>(PhotoResultPage.route(imagePath: path, barcode: barcode));
   }
 
   Future<void> _shutter() async {

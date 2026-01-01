@@ -42,14 +42,14 @@ class PendingScans extends ChangeNotifier {
   PhotoAnalyzer Function() analyzerFactory = PhotoAnalyzer.new;
 
   /// Starts reading [imagePath]; the home page shows it straight away.
-  PendingScan start(final String imagePath, {final List<String>? countryTags}) {
+  PendingScan start(final String imagePath, {final List<String>? countryTags, final String? barcode}) {
     final PendingScan scan = PendingScan(imagePath);
     _scans.insert(0, scan);
     if (_scans.length > 5) {
       _scans.removeLast();
     }
     notifyListeners();
-    unawaited(_run(scan, countryTags ?? <String>[ProductQuery.getCountry().offTag]));
+    unawaited(_run(scan, countryTags ?? <String>[ProductQuery.getCountry().offTag], barcode));
     return scan;
   }
 
@@ -59,7 +59,7 @@ class PendingScans extends ChangeNotifier {
     }
   }
 
-  Future<void> _run(final PendingScan scan, final List<String> countryTags) async {
+  Future<void> _run(final PendingScan scan, final List<String> countryTags, [final String? barcode]) async {
     // The ring creeps towards 90 % while the reader works, as Cal AI's
     // percentage does, and closes when the answer is in.
     final Timer ticker = Timer.periodic(const Duration(milliseconds: 60), (_) {
@@ -73,6 +73,7 @@ class PendingScans extends ChangeNotifier {
       final PhotoAnalysis analysis = await analyzerFactory().analyze(
         scan.imagePath,
         countryTags: countryTags,
+        liveBarcode: barcode,
         onStep: (int step) {
           scan.step = PhotoAnalyzer.steps[step.clamp(0, PhotoAnalyzer.steps.length - 1)];
           notifyListeners();

@@ -10,6 +10,7 @@ import 'package:smooth_app/services/barcode_rescue.dart';
 import 'package:smooth_app/services/brand_text_matcher.dart';
 import 'package:smooth_app/services/label_ocr.dart';
 import 'package:smooth_app/services/label_operator_parser.dart';
+import 'package:smooth_app/services/lens_client.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/ownership_service.dart';
@@ -45,7 +46,9 @@ class PhotoAnalyzer {
     Future<BrandOwnerResult?> Function(String brand)? online,
     Future<String?> Function(String path, Future<String?> Function(String path) read)? enhancedRead,
     Future<String?> Function(String path)? prepare,
+    Future<LensResult?> Function(String path)? lens,
   }) : _prepare = prepare ?? uprightCopy,
+       _lens = lens ?? const LensClient().identify,
        _readBarcode = readBarcode ?? bothReaders,
        _enhancedRead = enhancedRead,
        _localDb = localDb ?? OwnershipLocalDb.load,
@@ -54,6 +57,9 @@ class PhotoAnalyzer {
 
   final LabelOcr ocr;
   final Future<String?> Function(String path) _prepare;
+
+  /// 25/11: the vision model ("Lens"), asked when no barcode is read.
+  final Future<LensResult?> Function(String path) _lens;
   final Future<String?> Function(String path) _readBarcode;
   final Future<OwnershipLocalDb> Function() _localDb;
   final Future<Set<String>> Function() _packWords;
@@ -75,7 +81,9 @@ class PhotoAnalyzer {
     final String path, {
     final List<String> countryTags = const <String>[],
     final void Function(int step)? onStep,
+    final String? liveBarcode,
   }) async {
+    final String? known = liveBarcode;
     onStep?.call(0);
     final Stopwatch watch = Stopwatch()..start();
     // 23/11: the camera's full-size photo, turned upright (the camera only
@@ -88,7 +96,8 @@ class PhotoAnalyzer {
     // 25/11: both at the same time (they were one after the other).
     int tBars = 0;
     int tText = 0;
-    final Future<String?> bars = _safe(() => _readBarcode(work)).then((String? c) {
+    // 25/11: a barcode the live camera already read is not looked for again.
+    final Future<String?> bars = (known != null ? Future<String?>.value(known) : _safe(() => _readBarcode(work))).then((String? c) {
       tBars = watch.elapsedMilliseconds - tUpright;
       return c;
     });
@@ -97,7 +106,15 @@ class PhotoAnalyzer {
       return t;
     });
     String? barcode = await bars;
-    String how = barcode == null ? '' : 'bars';
+    String how = barcode == null ? '' : (known != null ? 'live' : 'bars');
+    // 25/11: no bars: the photo also goes to Lens, while the text is read.
+    int tLens = 0;
+    final Future<LensResult?>? lensing = barcode == null
+        ? _safe(() => _lens(work)).then((LensResult? r) {
+            tLens = watch.elapsedMilliseconds - tUpright;
+            return r;
+          })
+        : null;
     onStep?.call(1);
     final LabelText text = await reading ?? LabelText.empty;
     final List<String> lines = <String>[for (final PackTextLine l in text.lines) l.text];
@@ -140,13 +157,29 @@ class PhotoAnalyzer {
       barcode = await rescue;
       how = barcode == null ? 'none' : 'clearer';
     }
+    String lensSaw = '-';
+    if (lensing != null) {
+      final LensResult? seen = await lensing;
+      if (seen != null) {
+        lensSaw = seen.brand.isEmpty ? '?' : seen.brand;
+        final String? digits = LensClient.barcodeOf(seen);
+        if (barcode == null && digits != null) {
+          barcode = digits;
+          how = 'lens';
+        }
+        // What the model named comes first: it reads logos the text reader
+        // cannot, and a brand matched in loose text can be wrong.
+        final List<BrandCandidate> named = LensClient.candidates(seen, db, countryTags: countryTags);
+        found.insertAll(0, named);
+      }
+    }
     if (barcode == null) {
       how = 'none';
     }
     if (!identical(work, path)) {
       unawaited(_safe(() => File(work).delete()));
     }
-    lastRun = 'barcode=${barcode ?? '-'} via=$how brands=${found.length} lines=${lines.length} ms=${watch.elapsedMilliseconds} upright=$tUpright bars=$tBars text=$tText';
+    lastRun = 'barcode=${barcode ?? '-'} via=$how brands=${found.length} lines=${lines.length} ms=${watch.elapsedMilliseconds} upright=$tUpright bars=$tBars text=$tText lens=$tLens lensBrand=$lensSaw';
     debugPrint('OWNED_SCAN $lastRun');
     if (found.isEmpty && barcode != null && db != null) {
       // The company that registered the barcode's GS1 prefix.
