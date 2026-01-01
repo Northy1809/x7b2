@@ -1,0 +1,18 @@
+name: v
+
+on:
+  push:
+    branches: [t]
+
+jobs:
+  v:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - run: swiftc -O ci/vision.swift -o vision
+      - run: ./vision . | tee vision.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v
+          path: vision.txt
