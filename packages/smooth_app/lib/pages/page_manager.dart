@@ -73,6 +73,11 @@ class PageManagerState extends State<PageManager> {
   bool? _useNewHomePage;
   late List<Widget> _tabs;
 
+  /// Switches to [tab] from anywhere inside the tabs (e.g. the home page's
+  /// "Average moral score" opens Companies). Does nothing outside them.
+  static void showTab(final BuildContext context, final BottomNavigationTab tab) =>
+      context.findAncestorStateOfType<PageManagerState>()?._selectTab(tab, tab.index);
+
   void _selectTab(BottomNavigationTab tabItem, int index) {
     if (tabItem == _currentPage) {
       _navigatorKeys[tabItem]!.currentState!.popUntil(

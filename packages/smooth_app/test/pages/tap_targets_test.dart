@@ -123,6 +123,23 @@ void main() {
     expect(find.byType(OwnerPage), findsOneWidget);
   });
 
+  testWidgets('home: the average score cards are buttons', (WidgetTester tester) async {
+    tallPhone(tester);
+    final List<Product> scans = _scans();
+    final HomeSummary summary = HomeSummary(
+      products: scans,
+      insights: OwnerInsights.compute(scans, _db()),
+      lastSeen: <String, DateTime>{for (final Product p in scans) p.barcode!: DateTime.now()},
+    );
+    await pump(tester, OwnedHomePage(load: () async => summary));
+    final Finder moral = find.bySemanticsLabel(RegExp(r'^Average moral score'));
+    expect(tester.getSemantics(moral), isSemantics(isButton: true));
+    // Outside the tabs there is no Companies tab to switch to: nothing breaks.
+    await tester.tap(moral);
+    await settle(tester);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Companies tab: a row opens the company page', (WidgetTester tester) async {
     tallPhone(tester);
     await pump(

@@ -14,6 +14,7 @@ import 'package:smooth_app/pages/history_page.dart';
 import 'package:smooth_app/pages/home/home_scanner_card.dart';
 import 'package:smooth_app/pages/home/pending_scan_row.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
+import 'package:smooth_app/pages/page_manager.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/services/ethics_db.dart';
@@ -225,6 +226,9 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
                             value: s?.insights.averageEthics,
                             label: 'Average moral score',
                             icon: Icons.balance_rounded,
+                            // 19/11: the average is over your companies; the
+                            // Companies tab shows it and each company.
+                            onTap: () => PageManagerState.showTab(context, BottomNavigationTab.List),
                           ),
                           small: _moralSmall(s),
                         ),
@@ -233,6 +237,9 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
                             value: s?.averageHealth,
                             label: 'Average health score',
                             icon: CupertinoIcons.heart_fill,
+                            onTap: () => Navigator.of(context).push<void>(
+                              MaterialPageRoute<void>(builder: (_) => const HistoryPage()),
+                            ),
                           ),
                           small: _healthSmall(s),
                         ),
@@ -594,19 +601,22 @@ class _DottedRing extends CustomPainter {
 
 /// "44/100 Average moral score" with the ring, as Cal AI's calories card.
 class _BigCard extends StatelessWidget {
-  const _BigCard({required this.value, required this.label, required this.icon});
+  const _BigCard({required this.value, required this.label, required this.icon, this.onTap});
 
   final int? value;
   final String label;
   final IconData icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Semantics(
+      button: onTap != null,
       label: value == null ? '$label: not rated yet' : '$label $value out of 100',
       excludeSemantics: true,
       child: CalCard(
+        onTap: onTap,
         radius: 22.0,
         padding: const EdgeInsetsDirectional.fromSTEB(22.0, 0.0, 16.0, 0.0),
         child: Row(
