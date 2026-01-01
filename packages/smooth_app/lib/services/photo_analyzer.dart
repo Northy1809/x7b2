@@ -13,6 +13,7 @@ import 'package:smooth_app/services/label_operator_parser.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/ownership_service.dart';
+import 'package:smooth_app/services/zxing_barcode_reader.dart';
 
 /// What a photo of a pack told us.
 class PhotoAnalysis {
@@ -45,7 +46,7 @@ class PhotoAnalyzer {
     Future<String?> Function(String path, Future<String?> Function(String path) read)? enhancedRead,
     Future<String?> Function(String path)? prepare,
   }) : _prepare = prepare ?? uprightCopy,
-       _readBarcode = readBarcode ?? _mlKitBarcode,
+       _readBarcode = readBarcode ?? bothReaders,
        _enhancedRead = enhancedRead ?? BarcodeRescue.enhancedPasses,
        _localDb = localDb ?? OwnershipLocalDb.load,
        _packWords = packWords ?? BrandTextMatcher.loadPackWords,
@@ -204,17 +205,38 @@ class PhotoAnalyzer {
     }
   }
 
-  static Future<String?> _mlKitBarcode(final String path) async {
+  /// 24/11: the phone's reader (Apple Vision) first, zxing-cpp when it
+  /// finds nothing. When the phone's reader sees several product codes,
+  /// one zxing-cpp also reads wins.
+  static Future<String?> bothReaders(final String path) async {
+    final List<String> phone = await _safe(() => _phoneBarcodes(path)) ?? const <String>[];
+    if (phone.length == 1) {
+      return phone.first;
+    }
+    final List<String> zxing = await _safe(
+          () => ZxingBarcodeReader.readFile(path).timeout(const Duration(seconds: 8)),
+        ) ??
+        const <String>[];
+    for (final String code in phone) {
+      if (zxing.contains(code)) {
+        return code;
+      }
+    }
+    if (phone.isNotEmpty) {
+      return phone.first;
+    }
+    return zxing.isEmpty ? null : zxing.first;
+  }
+
+  static Future<List<String>> _phoneBarcodes(final String path) async {
     final MobileScannerController controller = MobileScannerController(autoStart: false);
     try {
       final BarcodeCapture? capture = await controller.analyzeImage(path).timeout(const Duration(seconds: 6));
-      for (final Barcode b in capture?.barcodes ?? const <Barcode>[]) {
-        final String? code = Gs1Code.toProductCode(b.rawValue ?? b.displayValue ?? '');
-        if (code != null) {
-          return code;
-        }
-      }
-      return null;
+      return <String>{
+        for (final Barcode b in capture?.barcodes ?? const <Barcode>[])
+          if (Gs1Code.toProductCode(b.rawValue ?? b.displayValue ?? '') != null)
+            Gs1Code.toProductCode(b.rawValue ?? b.displayValue ?? '')!,
+      }.toList();
     } finally {
       unawaited(controller.dispose());
     }
