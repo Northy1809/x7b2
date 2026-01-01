@@ -8,6 +8,7 @@ import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/helpers/haptics.dart';
 import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
+import 'package:smooth_app/pages/owner/moral_score_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/ethics_details.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/pages/product/product_page/overview/product_overview.dart';
@@ -67,9 +68,6 @@ class _OwnerData {
 class _OwnerPageState extends State<OwnerPage> {
   late final Future<_OwnerData> _data = _load();
   final ScrollController _scroll = ScrollController();
-  final Map<EthicsCategory, GlobalKey> _categoryKeys = <EthicsCategory, GlobalKey>{
-    for (final EthicsCategory c in EthicsCategory.values) c: GlobalKey(),
-  };
 
   /// The small name in the top bar shows once the big one has scrolled away.
   bool _titleVisible = false;
@@ -127,19 +125,9 @@ class _OwnerPageState extends State<OwnerPage> {
     );
   }
 
-  void _jumpTo(final EthicsCategory category) {
-    final BuildContext? target = _categoryKeys[category]?.currentContext;
-    if (target == null) {
-      return;
-    }
-    Haptics.select();
-    Scrollable.ensureVisible(
-      target,
-      duration: CalMotion.page * 2,
-      curve: Curves.easeInOutCubic,
-      alignment: 0.12,
-    );
-  }
+  /// The moral score page, the same one a scan or a product opens.
+  void _openMoral(final EthicsScoreResult? result, final EthicsDb? db, {final EthicsCategory? category}) =>
+      unawaited(MoralScorePage.open(context, result: result, ownerName: widget.name, db: db, category: category));
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +196,11 @@ class _OwnerPageState extends State<OwnerPage> {
                     sliver: SliverToBoxAdapter(
                       child: FadeUpIn(
                         index: 1,
-                        child: _ScoreCard(result: result, loading: data == null && company == null),
+                        child: _ScoreCard(
+                          result: result,
+                          loading: data == null && company == null,
+                          onTap: data == null && company == null ? null : () => _openMoral(result, data?.ethics),
+                        ),
                       ),
                     ),
                   ),
@@ -225,7 +217,7 @@ class _OwnerPageState extends State<OwnerPage> {
                                 Expanded(
                                   child: _CategoryCard(
                                     category: result.categories[i],
-                                    onTap: () => _jumpTo(result.categories[i].category),
+                                    onTap: () => _openMoral(result, data?.ethics, category: result.categories[i].category),
                                   ),
                                 ),
                               ],
@@ -255,10 +247,10 @@ class _OwnerPageState extends State<OwnerPage> {
                             _ScannedGroup(products: data.scanned),
                           ],
                           const SizedBox(height: 32.0),
-                          const CalSectionTitle('The record'),
+                          const CalSectionTitle('Scandals and crises'),
                           const SizedBox(height: 4.0),
                           Text(
-                            'Documented cases, each with its sources. Tap one to read it.',
+                            'The most serious first, each with its sources. Tap one to read it.',
                             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                           ),
                           const SizedBox(height: 12.0),
@@ -279,16 +271,8 @@ class _OwnerPageState extends State<OwnerPage> {
                               ),
                             )
                           else
-                            for (final EthicsCategoryScore c in result.categories)
-                              Padding(
-                                key: _categoryKeys[c.category],
-                                padding: const EdgeInsetsDirectional.only(bottom: 12.0),
-                                child: CalCard(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 18.0, 16.0, 16.0),
-                                  child: EthicsCategoryBlock(c, topPadding: 0.0),
-                                ),
-                              ),
-                          const SizedBox(height: 4.0),
+                            _RecordPreview(result: result, onSeeAll: () => _openMoral(result, data.ethics)),
+                          const SizedBox(height: 16.0),
                           CalCard(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,19 +373,24 @@ class _Hero extends StatelessWidget {
 /// Cal AI's big calories card: "13/100", "Moral score", the band, and a
 /// big ink ring with the scales in the middle.
 class _ScoreCard extends StatelessWidget {
-  const _ScoreCard({required this.result, required this.loading});
+  const _ScoreCard({required this.result, required this.loading, this.onTap});
 
   final EthicsScoreResult? result;
   final bool loading;
+
+  /// Opens the moral score page.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final int? score = result?.score;
     return Semantics(
+      button: onTap != null,
       label: score == null ? 'Moral score: not rated yet' : 'Moral score $score out of 100, ${result!.band.label}',
       excludeSemantics: true,
       child: CalCard(
+        onTap: onTap,
         radius: 22.0,
         padding: const EdgeInsetsDirectional.fromSTEB(22.0, 20.0, 18.0, 20.0),
         child: Row(
@@ -421,16 +410,34 @@ class _ScoreCard extends StatelessWidget {
                     style: theme.textTheme.bodyMedium?.copyWith(fontSize: 15.0, color: theme.colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 12.0),
-                  Container(
-                    padding: const EdgeInsetsDirectional.symmetric(horizontal: 12.0, vertical: 6.0),
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark ? BrandColors.fillDark : BrandColors.fill,
-                      borderRadius: BorderRadius.circular(100.0),
-                    ),
-                    child: Text(
-                      score == null ? (loading ? 'Checking…' : 'Not rated yet') : result!.band.label,
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 13.0),
-                    ),
+                  Wrap(
+                    spacing: 10.0,
+                    runSpacing: 6.0,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsetsDirectional.symmetric(horizontal: 12.0, vertical: 6.0),
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark ? BrandColors.fillDark : BrandColors.fill,
+                          borderRadius: BorderRadius.circular(100.0),
+                        ),
+                        child: Text(
+                          score == null ? (loading ? 'Checking…' : 'Not rated yet') : result!.band.label,
+                          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 13.0),
+                        ),
+                      ),
+                      if (onTap != null && score != null)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              'See why',
+                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 13.0),
+                            ),
+                            const Icon(CupertinoIcons.chevron_right, size: 13.0),
+                          ],
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -498,6 +505,71 @@ class _CategoryCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The three worst cases as the moral score page draws them, and a button
+/// to all of them there.
+class _RecordPreview extends StatelessWidget {
+  const _RecordPreview({required this.result, required this.onSeeAll});
+
+  final EthicsScoreResult result;
+  final VoidCallback onSeeAll;
+
+  static const int shown = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final List<EthicsItem> issues = <EthicsItem>[for (final EthicsCategoryScore c in result.categories) ...c.issues]
+      ..sort((EthicsItem a, EthicsItem b) {
+        final int bySeverity = b.severity - a.severity;
+        return bySeverity != 0 ? bySeverity : (b.year ?? 0) - (a.year ?? 0);
+      });
+    final List<EthicsItem> all = <EthicsItem>[
+      ...issues,
+      for (final EthicsCategoryScore c in result.categories) ...c.good,
+      for (final EthicsCategoryScore c in result.categories) ...c.notes,
+    ];
+    final String count = issues.isEmpty
+        ? 'See the full record'
+        : 'See all ${issues.length} ${issues.length == 1 ? 'case' : 'cases'}';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (final EthicsItem item in all.take(shown))
+          Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: 10.0),
+            child: ScandalCard(item),
+          ),
+        Semantics(
+          button: true,
+          child: PressScale(
+            scale: 0.98,
+            onTap: onSeeAll,
+            child: Container(
+              height: 52.0,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(color: calHairline(context)),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    count,
+                    style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 15.0),
+                  ),
+                  const SizedBox(width: 6.0),
+                  const Icon(CupertinoIcons.chevron_right, size: 14.0),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

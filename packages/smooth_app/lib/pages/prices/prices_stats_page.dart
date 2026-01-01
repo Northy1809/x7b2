@@ -8,6 +8,7 @@ import 'package:smooth_app/generic_lib/widgets/smooth_back_button.dart';
 import 'package:smooth_app/helpers/launch_url_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/query/product_query.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
@@ -53,7 +54,7 @@ class _PricesStatsPageState extends State<PricesStatsPage> {
         leading: const SmoothBackButton(),
       ),
       body: _statsData == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CalLoader())
           : _statsData!.isError
           ? Center(
               child: ListTile(

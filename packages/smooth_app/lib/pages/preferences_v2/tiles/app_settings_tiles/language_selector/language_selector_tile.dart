@@ -15,6 +15,7 @@ import 'package:smooth_app/pages/preferences_v2/tiles/preference_tile.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_list_choice.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_selector_provider.dart';
 import 'package:smooth_app/widgets/text/text_highlighter.dart';
@@ -52,7 +53,7 @@ class LanguageSelectorTile extends PreferenceTile {
   Widget _buildLoadingState() {
     return const SizedBox(
       height: 20.0,
-      child: Center(child: CircularProgressIndicator.adaptive()),
+      child: Center(child: CalLoader(size: 16.0, stroke: 2.0)),
     );
   }
 

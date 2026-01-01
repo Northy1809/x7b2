@@ -10,6 +10,7 @@ import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Widget displaying a Lazy Counter: cached value, refresh button, and loading.
 class LazyCounterWidget extends StatefulWidget {
@@ -70,14 +71,9 @@ class _LazyCounterWidgetState extends State<LazyCounterWidget> {
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               if (_loading)
-                SizedBox.square(
+                const SizedBox.square(
                   dimension: 14.0,
-                  child: CircularProgressIndicator.adaptive(
-                    strokeWidth: 1.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      extension.secondaryVibrant,
-                    ),
-                  ),
+                  child: CalLoader(size: 14.0, stroke: 1.6),
                 )
               else
                 const icons.Reload(size: 16.0),

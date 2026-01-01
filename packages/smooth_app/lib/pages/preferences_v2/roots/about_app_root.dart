@@ -12,6 +12,7 @@ import 'package:smooth_app/pages/preferences_v2/tiles/toggle_preference_tile.dar
 import 'package:smooth_app/pages/preferences_v2/tiles/url_preference_tile.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class AboutAppRoot extends PreferencesRoot {
   const AboutAppRoot({required super.title});
@@ -69,7 +70,7 @@ class AboutAppRoot extends PreferencesRoot {
               children: <Widget>[
                 SizedBox.square(
                   dimension: 12.0,
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CalLoader(size: 12.0, stroke: 1.6),
                 ),
               ],
             );

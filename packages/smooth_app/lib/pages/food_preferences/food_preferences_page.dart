@@ -14,6 +14,7 @@ import 'package:smooth_app/pages/food_preferences/pages/summary_page.dart';
 import 'package:smooth_app/pages/food_preferences/preferences_page_projects.dart';
 import 'package:smooth_app/pages/food_preferences/widgets/attribute_group_page.dart';
 import 'package:smooth_app/pages/food_preferences/widgets/food_preferences_navigation_bar.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 import 'package:smooth_app/widgets/v2/smooth_topbar2.dart';
 
@@ -168,7 +169,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
           title: appLocalizations.food_preferences_page_title_introduction,
           productType: widget.project.productType,
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(child: CalLoader()),
       );
     }
 

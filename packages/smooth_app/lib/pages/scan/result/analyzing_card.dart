@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// "Analyzing…" while a scan or photo is read: a spinner, the steps done so
 /// far and the one running, and faint bars where the answer will land.
@@ -110,9 +111,7 @@ class AnalyzingCard extends StatelessWidget {
                               dimension: 22.0,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.all(3.0),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                ),
+                                child: CalLoader(size: 16.0, stroke: 2.4),
                               ),
                             )
                           : Icon(

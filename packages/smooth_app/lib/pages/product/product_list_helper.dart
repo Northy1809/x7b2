@@ -17,6 +17,7 @@ import 'package:smooth_app/pages/product_list_user_dialog_helper.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_checkbox.dart';
 
 class AddProductToListContainer extends StatelessWidget {
@@ -59,7 +60,7 @@ class _AddToProductListLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SliverFillRemaining(
-      child: Center(child: CircularProgressIndicator.adaptive()),
+      child: Center(child: CalLoader()),
     );
   }
 }

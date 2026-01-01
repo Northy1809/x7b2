@@ -12,6 +12,7 @@ import 'package:smooth_app/pages/product/helpers/pinch_to_zoom_indicator.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_indicator_icon.dart';
 import 'package:smooth_app/widgets/smooth_interactive_viewer.dart';
 
@@ -202,7 +203,7 @@ class _EditProductImageViewerState extends State<EditProductImageViewer>
   }
 
   Widget _loadingWidget() {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: CalLoader());
   }
 
   @override

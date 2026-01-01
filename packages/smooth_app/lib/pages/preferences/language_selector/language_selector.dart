@@ -12,6 +12,7 @@ import 'package:smooth_app/helpers/provider_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/preferences/user_preferences_languages_list.dart';
 import 'package:smooth_app/query/product_query.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_list_choice.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_selector_provider.dart';
 import 'package:smooth_app/widgets/text/text_highlighter.dart';
@@ -52,7 +53,7 @@ class LanguageSelector extends StatelessWidget {
               SizedBox(
                 height: loadingHeight,
                 child: const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CalLoader(size: 16.0, stroke: 2.0),
                 ),
               ),
             PreferencesSelectorLoadedState<OpenFoodFactsLanguage> _ =>

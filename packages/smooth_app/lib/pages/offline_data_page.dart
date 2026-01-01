@@ -13,6 +13,7 @@ import 'package:smooth_app/generic_lib/widgets/smooth_snackbar.dart';
 import 'package:smooth_app/helpers/app_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/product/product_type_extensions.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
@@ -163,7 +164,7 @@ class _StatsWidget extends StatelessWidget {
               return const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator.adaptive(),
+                child: CalLoader(size: 16.0, stroke: 2.0),
               );
             }
           },

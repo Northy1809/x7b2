@@ -14,6 +14,7 @@ import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/onboarding/common/tooltip_shape_border.dart';
 import 'package:smooth_app/pages/onboarding/next_button.dart';
 import 'package:smooth_app/pages/onboarding/onboarding_flow_navigator.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/text/text_style_extensions.dart';
 
 class KnowledgePanelPageTemplate extends StatefulWidget {
@@ -76,7 +77,7 @@ class _KnowledgePanelPageTemplateState
         );
       }
       if (snapshot.connectionState != ConnectionState.done) {
-        return const Center(child: CircularProgressIndicator.adaptive());
+        return const Center(child: CalLoader());
       }
 
       final List<Widget> children = KnowledgePanelsBuilder.getChildren(

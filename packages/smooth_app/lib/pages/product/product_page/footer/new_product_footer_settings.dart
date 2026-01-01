@@ -14,6 +14,7 @@ import 'package:smooth_app/pages/product/product_page/footer/new_product_footer.
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_list_diff.dart';
 
 /// A Settings button allowing to reorder and hide the action bar items
@@ -96,7 +97,7 @@ class _ProductActionBarModalLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator.adaptive());
+    return const Center(child: CalLoader());
   }
 }
 

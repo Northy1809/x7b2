@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class RiveAnimationPlayer extends StatefulWidget {
   const RiveAnimationPlayer(
@@ -39,7 +40,7 @@ class _RiveAnimationPlayerState extends State<RiveAnimationPlayer> {
   Widget build(BuildContext context) {
     final Widget child;
     if (!_isInitialized) {
-      child = const Center(child: CircularProgressIndicator.adaptive());
+      child = const Center(child: CalLoader());
     } else {
       child = RiveWidget(controller: _controller, fit: Fit.cover);
     }

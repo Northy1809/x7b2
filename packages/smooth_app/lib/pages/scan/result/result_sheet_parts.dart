@@ -6,6 +6,7 @@ import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
 import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
 /// Building blocks of the result sheet (photo or barcode scan, history,
 /// search), laid out as Cal AI's food result: a small tag and the product
@@ -76,7 +77,7 @@ class OwnerResultHeader extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: loading
-                ? const SizedBox.square(dimension: 22.0, child: CircularProgressIndicator(strokeWidth: 2.4))
+                ? const OwnedLoader(size: 40.0)
                 : CompanyLogo(names: known ? logoNames : const <String?>[], size: 64.0, radius: 16.0),
           ),
           const SizedBox(width: 14.0),

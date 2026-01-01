@@ -16,6 +16,7 @@ import 'package:smooth_app/pages/crop_parameters.dart';
 import 'package:smooth_app/pages/image_crop_page.dart';
 import 'package:smooth_app/pages/prices/price_add_helper.dart';
 import 'package:smooth_app/pages/prices/price_model.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Card that displays the bulk proof button for price adding.
 class PriceBulkProofCard extends StatefulWidget {
@@ -43,7 +44,7 @@ class _PriceBulkProofCardState extends State<PriceBulkProofCard> {
       ),
       child: _text.isNotEmpty
           ? ListTile(
-              leading: const CircularProgressIndicator.adaptive(),
+              leading: const CalLoader(size: 22.0, stroke: 2.4),
               title: Text(_text),
             )
           : Column(

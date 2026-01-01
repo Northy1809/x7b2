@@ -3,6 +3,7 @@ import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class SmoothDropdownButton<T> extends StatelessWidget {
   const SmoothDropdownButton({
@@ -85,7 +86,7 @@ class SmoothDropdownButton<T> extends StatelessWidget {
                   padding: EdgeInsetsDirectional.only(end: MEDIUM_SPACE),
                   child: SizedBox.square(
                     dimension: 12.0,
-                    child: CircularProgressIndicator(),
+                    child: CalLoader(size: 12.0, stroke: 1.6),
                   ),
                 ),
               )

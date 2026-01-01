@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/haptics.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
 /// The scan result layout (as in Cal AI, Yuka): the photo fills the top and
 /// stays still; the answer is a sheet that pops up over it and slides up as
@@ -482,10 +483,7 @@ class _AnalyzingPill extends StatelessWidget {
               children: <Widget>[
                 const SizedBox.square(
                   dimension: 18.0,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.2,
-                    color: Color(0xFF121212),
-                  ),
+                  child: OwnedMark(size: 20.0, color: Color(0xFF121212), motion: OwnedMarkMotion.loop),
                 ),
                 const SizedBox(width: 10.0),
                 Text(

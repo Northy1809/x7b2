@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/ui_helpers.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// A wrapper widget for Rive animations that supports visibility detection.
@@ -62,7 +63,7 @@ class _RiveAnimationState extends State<RiveAnimation> {
             switch (state) {
               case RiveLoading():
                 return const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CalLoader(),
                 );
 
               case RiveFailed():

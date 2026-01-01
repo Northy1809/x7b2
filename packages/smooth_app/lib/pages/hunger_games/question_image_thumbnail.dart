@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/pages/hunger_games/question_image_full_page.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Thumbnail of a question image.
 class QuestionImageThumbnail extends StatelessWidget {
@@ -29,7 +30,7 @@ class QuestionImageThumbnail extends StatelessWidget {
         loadingBuilder: (_, Widget child, ImageChunkEvent? progress) =>
             progress == null
             ? child
-            : const CircularProgressIndicator.adaptive(),
+            : const CalLoader(size: 16.0, stroke: 2.0),
       ),
     ),
   );

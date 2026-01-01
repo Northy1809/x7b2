@@ -19,6 +19,7 @@ import 'package:smooth_app/resources/app_animations.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_indicator_icon.dart';
 import 'package:smooth_app/widgets/smooth_interactive_viewer.dart';
 import 'package:smooth_app/widgets/text/text_highlighter.dart';
@@ -327,7 +328,7 @@ class _EditOCRImageFoundState extends State<_EditOCRImageFound> {
   ColoredBox _loadingWidget() {
     return const ColoredBox(
       color: PictureNotFound.defaultBackgroundColor,
-      child: Center(child: CircularProgressIndicator()),
+      child: Center(child: CalLoader()),
     );
   }
 

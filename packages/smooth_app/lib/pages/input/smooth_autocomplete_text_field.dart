@@ -9,6 +9,7 @@ import 'package:smooth_app/generic_lib/widgets/smooth_text_form_field.dart';
 import 'package:smooth_app/helpers/strings_helper.dart';
 import 'package:smooth_app/pages/input/debounced_text_editing_controller.dart';
 import 'package:smooth_app/pages/product/autocomplete.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Autocomplete text field.
 class SmoothAutocompleteTextField extends StatefulWidget {
@@ -147,9 +148,7 @@ class _SmoothAutocompleteTextFieldState
                       Theme.of(context).textTheme.titleMedium?.fontSize ?? 15,
                   height:
                       Theme.of(context).textTheme.titleMedium?.fontSize ?? 15,
-                  child: const CircularProgressIndicator.adaptive(
-                    strokeWidth: 1.0,
-                  ),
+                  child: const CalLoader(size: 15.0, stroke: 1.6),
                 ),
               ),
             ),

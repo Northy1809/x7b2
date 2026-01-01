@@ -12,6 +12,7 @@ import 'package:smooth_app/generic_lib/dialogs/smooth_alert_dialog.dart';
 import 'package:smooth_app/helpers/global_vars.dart';
 import 'package:smooth_app/helpers/launch_url_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class ContributeUIHelper {
   const ContributeUIHelper._();
@@ -170,7 +171,7 @@ class ContributeUIHelper {
 
                       return const Padding(
                         padding: EdgeInsetsDirectional.all(LARGE_SPACE),
-                        child: CircularProgressIndicator.adaptive(),
+                        child: CalLoader(),
                       );
                     },
               ),

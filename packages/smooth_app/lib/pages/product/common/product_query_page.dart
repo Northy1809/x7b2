@@ -29,6 +29,7 @@ import 'package:smooth_app/query/paged_product_query.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/ranking_floating_action_button.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
@@ -223,7 +224,7 @@ class _ProductQueryPageState extends State<ProductQueryPage>
                       top: VERY_LARGE_SPACE,
                       bottom: VERY_LARGE_SPACE + 60.0,
                     ),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CalLoader()),
                   ),
                 );
               }

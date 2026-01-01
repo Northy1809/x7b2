@@ -13,6 +13,7 @@ import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/services/smooth_services.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_floating_message.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -123,7 +124,7 @@ class _ExternalPageState extends State<ExternalPage> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: CircularProgressIndicator.adaptive()),
+      body: Center(child: CalLoader()),
     );
   }
 }

@@ -32,6 +32,7 @@ import 'package:smooth_app/resources/app_animations.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 import 'package:smooth_app/widgets/will_pop_scope.dart';
 
@@ -497,7 +498,7 @@ class _NutritionPageBodyState extends State<_NutritionPageBody> {
                                 child: loading
                                     ? const SizedBox.square(
                                         dimension: 20.0,
-                                        child: CircularProgressIndicator(),
+                                        child: CalLoader(size: 16.0, stroke: 2.0),
                                       )
                                     : Text(
                                         appLocalizations

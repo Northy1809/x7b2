@@ -15,6 +15,7 @@ import 'package:smooth_app/pages/product/common/product_query_page_helper.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Page that lists all product lists.
 class AllProductsListModal extends StatelessWidget {
@@ -39,7 +40,7 @@ class AllProductsListModal extends StatelessWidget {
           (BuildContext context, AsyncSnapshot<List<ProductList>> snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator.adaptive()),
+                child: Center(child: CalLoader()),
               );
             }
             final List<ProductList> productLists =

@@ -17,6 +17,7 @@ import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
 import 'package:smooth_app/widgets/autosize_text.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class ProductPicture extends StatefulWidget {
   ProductPicture.fromProduct({
@@ -570,7 +571,7 @@ class _ProductPictureWithImageProvider extends StatelessWidget {
           ? Border.all(color: Theme.of(context).dividerColor, width: 1.0)
           : null,
     ),
-    child: const Center(child: CircularProgressIndicator()),
+    child: const Center(child: CalLoader(size: 16.0, stroke: 2.0)),
   );
 }
 

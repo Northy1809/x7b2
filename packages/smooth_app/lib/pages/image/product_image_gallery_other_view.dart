@@ -10,6 +10,7 @@ import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/image/product_image_other_page.dart';
 import 'package:smooth_app/pages/image/product_image_widget.dart';
 import 'package:smooth_app/pages/product/common/product_refresher.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_indicator_icon.dart';
 
 /// Number of columns for the grid.
@@ -72,7 +73,7 @@ class _ProductImageGalleryOtherViewState
                   child: SizedBox(
                     width: squareSize,
                     height: squareSize,
-                    child: const CircularProgressIndicator.adaptive(),
+                    child: const CalLoader(size: 16.0, stroke: 2.0),
                   ),
                 ),
               );

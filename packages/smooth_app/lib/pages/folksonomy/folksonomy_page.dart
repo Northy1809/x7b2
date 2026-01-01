@@ -14,6 +14,7 @@ import 'package:smooth_app/pages/folksonomy/folksonomy_product_tag_extension.dar
 import 'package:smooth_app/pages/folksonomy/folksonomy_provider.dart';
 import 'package:smooth_app/pages/product/common/product_refresher.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_expandable_floating_action_button.dart';
 import 'package:smooth_app/widgets/smooth_menu_button.dart';
@@ -307,7 +308,7 @@ class _FolksonomyContentState extends State<_FolksonomyContent> {
     }
 
     if (state is FolksonomyStateLoading && _tags.isEmpty) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return const Center(child: CalLoader());
     } else if (state is FolksonomyStateLoaded && state.tags!.isEmpty) {
       return const FolksonomyEmptyPage();
     } else if (state is FolksonomyStateError && state.action == null) {

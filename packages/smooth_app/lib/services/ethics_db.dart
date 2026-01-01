@@ -187,6 +187,20 @@ class EthicsScore {
     return 0.3;
   }
 
+  /// What one item does to its category before rounding and the 0-100
+  /// limit: "-45" for a recent very serious case, "+15" for a good
+  /// practice, 0 for a note.
+  static int impact(final EthicsItem item, {final int? currentYear}) {
+    if (item.isNote) {
+      return 0;
+    }
+    if (item.isGood) {
+      return goodBonus;
+    }
+    final int now = currentYear ?? DateTime.now().year;
+    return -((deduction[item.severity] ?? 15) * ageFactor(item.year, now)).round();
+  }
+
   static EthicsScoreResult compute(final EthicsCompany company, {final int? currentYear}) {
     final int now = currentYear ?? DateTime.now().year;
     final List<EthicsCategoryScore> categories = <EthicsCategoryScore>[];

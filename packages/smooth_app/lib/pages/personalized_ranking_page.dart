@@ -19,6 +19,7 @@ import 'package:smooth_app/pages/product/common/product_list_item_simple.dart';
 import 'package:smooth_app/pages/product_list_user_dialog_helper.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_menu_button.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
@@ -149,7 +150,7 @@ class _PersonalizedRankingPageState extends State<PersonalizedRankingPage>
             );
           }
           if (_model.loadingStatus != LoadingStatus.LOADED) {
-            return const Center(child: CircularProgressIndicator.adaptive());
+            return const Center(child: CalLoader());
           }
 
           _model.scores.sort(

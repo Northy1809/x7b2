@@ -6,6 +6,7 @@ import 'package:smooth_app/generic_lib/widgets/smooth_card.dart';
 import 'package:smooth_app/generic_lib/widgets/smooth_text_form_field.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/query/product_query.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
@@ -125,7 +126,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                     ),
                   const Spacer(flex: 4),
                   if (_runningQuery)
-                    const CircularProgressIndicator.adaptive()
+                    const CalLoader()
                   else
                     ElevatedButton(
                       onPressed: () {

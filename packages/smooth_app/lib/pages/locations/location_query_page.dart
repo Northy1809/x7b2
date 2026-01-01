@@ -18,6 +18,7 @@ import 'package:smooth_app/pages/product/common/search_empty_screen.dart';
 import 'package:smooth_app/pages/product/common/search_loading_screen.dart';
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
@@ -135,7 +136,7 @@ class _LocationQueryPageState extends State<LocationQueryPage>
               }
               return const Padding(
                 padding: EdgeInsetsDirectional.only(top: SMALL_SPACE),
-                child: Center(child: CircularProgressIndicator.adaptive()),
+                child: Center(child: CalLoader()),
               );
             }
             return KeyedSubtree(

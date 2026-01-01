@@ -11,6 +11,7 @@ import 'package:smooth_app/pages/product/product_page/widgets/product_page_title
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:vector_graphics/vector_graphics.dart';
 
 class FolksonomyListAttributesCard extends StatelessWidget {
@@ -62,7 +63,7 @@ class _FolksonomyCardBody extends StatelessWidget {
       child: Consumer<FolksonomyProvider>(
         builder: (BuildContext context, FolksonomyProvider provider, _) {
           if (provider.value is FolksonomyStateLoading) {
-            return const Center(child: CircularProgressIndicator.adaptive());
+            return const Center(child: CalLoader());
           } else if (provider.value.tags?.isNotEmpty != true) {
             return InkWell(
               onTap: onEmptyPageTag,

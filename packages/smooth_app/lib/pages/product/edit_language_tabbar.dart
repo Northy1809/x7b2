@@ -14,6 +14,7 @@ import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/services/smooth_services.dart';
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_tabbar.dart';
 
 class EditLanguageTabBar extends StatefulWidget {
@@ -128,7 +129,7 @@ class _EditLanguageTabBarState extends State<EditLanguageTabBar>
                   ) {
                     if (provider.value.languages == null) {
                       return const Center(
-                        child: CircularProgressIndicator.adaptive(),
+                        child: CalLoader(),
                       );
                     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
 class LicensesPage extends StatelessWidget {
@@ -22,7 +23,7 @@ class LicensesPage extends StatelessWidget {
           builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
             final PackageInfo? packageInfo = snapshot.data;
             if (packageInfo == null) {
-              return const CircularProgressIndicator.adaptive();
+              return const CalLoader();
             }
 
             return LicensePage(

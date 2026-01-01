@@ -321,25 +321,47 @@ class EthicsItemTile extends StatelessWidget {
     );
   }
 
-  static (IconData, Color) _style(final EthicsItem item) {
-    if (item.isGood) {
-      return (CupertinoIcons.checkmark_alt, const Color(0xFF34A853));
-    }
-    if (item.isNote) {
-      return (CupertinoIcons.info, const Color(0xFF767676));
-    }
-    return switch (item.severity) {
-      3 => (CupertinoIcons.exclamationmark, BrandColors.accentRed),
-      2 => (CupertinoIcons.exclamationmark_triangle_fill, BrandColors.accentOrange),
-      _ => (CupertinoIcons.minus, const Color(0xFF767676)),
-    };
-  }
+  static (IconData, Color) _style(final EthicsItem item) => ethicsItemStyle(item);
 }
 
-/// The whole case in a white sheet: icon and meta, the title big, the
-/// story, then its sources.
+/// Green for good practices.
+const Color kEthicsGood = Color(0xFF2E9E57);
+
+/// Icon and colour for a case: red for very serious, orange for serious,
+/// grey for minor and notes, green for good practices.
+(IconData, Color) ethicsItemStyle(final EthicsItem item) {
+  if (item.isGood) {
+    return (CupertinoIcons.checkmark_alt, kEthicsGood);
+  }
+  if (item.isNote) {
+    return (CupertinoIcons.info, const Color(0xFF767676));
+  }
+  return switch (item.severity) {
+    3 => (CupertinoIcons.exclamationmark, BrandColors.accentRed),
+    2 => (CupertinoIcons.exclamationmark_triangle_fill, BrandColors.accentOrange),
+    _ => (CupertinoIcons.minus, const Color(0xFF767676)),
+  };
+}
+
+/// "Takes 45 points off Climate & environment." in plain words.
+String ethicsImpactLine(final EthicsItem item, {final int? currentYear}) {
+  final int points = EthicsScore.impact(item, currentYear: currentYear);
+  final String category = item.category.label;
+  if (item.isNote) {
+    return 'For information only. It does not change the score.';
+  }
+  if (item.isGood) {
+    return 'Adds $points points to $category.';
+  }
+  final int full = EthicsScore.deduction[item.severity] ?? 15;
+  return 'Takes ${-points} points off $category'
+      '${-points < full ? ', less than a new case because it is older' : ''}.';
+}
+
+/// The whole case in a white sheet: what kind of case it is, the title
+/// big, what it costs the score, the story, then its sources.
 Future<void> showEthicsItemSheet(final BuildContext context, final EthicsItem item) {
-  final (IconData icon, Color color) = EthicsItemTile._style(item);
+  final (IconData icon, Color color) = ethicsItemStyle(item);
   final String meta = EthicsItemTile(item)._meta;
   return showModalBottomSheet<void>(
     context: context,
@@ -370,9 +392,11 @@ Future<void> showEthicsItemSheet(final BuildContext context, final EthicsItem it
                     child: Icon(icon, size: 16.0, color: color),
                   ),
                   const SizedBox(width: 10.0),
-                  Text(
-                    meta,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  Expanded(
+                    child: Text(
+                      '$meta · ${ethicsCategoryShort(item.category)}',
+                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    ),
                   ),
                 ],
               ),
@@ -380,6 +404,19 @@ Future<void> showEthicsItemSheet(final BuildContext context, final EthicsItem it
               Text(
                 item.title,
                 style: theme.textTheme.titleLarge?.copyWith(fontSize: 24.0, fontWeight: FontWeight.w700, letterSpacing: -0.5, height: 1.2),
+              ),
+              const SizedBox(height: 14.0),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsetsDirectional.symmetric(horizontal: 14.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14.0),
+                ),
+                child: Text(
+                  ethicsImpactLine(item),
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 14.0, height: 1.35),
+                ),
               ),
               if (item.text.isNotEmpty) ...<Widget>[
                 const SizedBox(height: 12.0),

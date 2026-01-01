@@ -6,6 +6,7 @@ import 'package:smooth_app/generic_lib/empty_screen_layout.dart';
 import 'package:smooth_app/helpers/provider_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/prices/infinite_scroll_manager.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// A generic stateful widget for infinite scrolling lists that works with InfiniteScrollManager.
 class InfiniteScrollSliverList<T> extends StatefulWidget {
@@ -97,7 +98,7 @@ class _InfiniteScrollSliverListState<T>
   Widget build(BuildContext context) {
     if (_isInitialLoading) {
       return const SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator.adaptive()),
+        child: Center(child: CalLoader()),
       );
     }
 

@@ -10,6 +10,7 @@ import 'package:smooth_app/pages/preferences/country_selector/country.dart';
 import 'package:smooth_app/pages/prices/emoji_helper.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/widgets/autosize_text.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_list_choice.dart';
 import 'package:smooth_app/widgets/selector_screen/smooth_screen_selector_provider.dart';
 import 'package:smooth_app/widgets/text/text_highlighter.dart';
@@ -50,7 +51,7 @@ class CountrySelector extends StatelessWidget {
           return switch (provider.value) {
             PreferencesSelectorLoadingState<Country> _ => SizedBox(
               height: loadingHeight,
-              child: const Center(child: CircularProgressIndicator.adaptive()),
+              child: const Center(child: CalLoader(size: 16.0, stroke: 2.0)),
             ),
             PreferencesSelectorLoadedState<Country> _ => _CountrySelectorButton(
               icon: icon,

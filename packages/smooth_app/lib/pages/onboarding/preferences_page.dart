@@ -17,6 +17,7 @@ import 'package:smooth_app/pages/onboarding/next_button.dart';
 import 'package:smooth_app/pages/onboarding/onboarding_flow_navigator.dart';
 import 'package:smooth_app/pages/preferences/user_preferences_food.dart';
 import 'package:smooth_app/pages/product/summary_card.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 class PreferencesPage extends StatefulWidget {
   const PreferencesPage(this._localDatabase, this.backgroundColor) : super();
@@ -55,7 +56,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
         );
       }
       if (snapshot.connectionState != ConnectionState.done) {
-        return const Center(child: CircularProgressIndicator.adaptive());
+        return const Center(child: CalLoader());
       }
       return _Helper(_product, widget.backgroundColor);
     },

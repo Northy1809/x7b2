@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/data_models/continuous_scan_model.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/pages/owner/moral_score_page.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
-import 'package:smooth_app/pages/product/product_page/overview/ethics_details.dart';
 import 'package:smooth_app/pages/scan/result/result_sheet_parts.dart';
 import 'package:smooth_app/pages/scan/result/scan_result_page.dart';
 import 'package:smooth_app/pages/scan/result/scan_sheet_scaffold.dart';
@@ -330,14 +330,11 @@ class _PhotoResultPageState extends State<PhotoResultPage> {
                       'Health score',
                       const _HealthNeedsBarcode(),
                     ),
-              onMoralTap: () => DetailsPage.open(
+              onMoralTap: () => MoralScorePage.open(
                 context,
-                'Moral score',
-                EthicsDetails(
-                  result: ethics,
-                  ownerName: current.owner.owner,
-                  db: _ethics,
-                ),
+                result: ethics,
+                ownerName: current.owner.owner,
+                db: _ethics,
               ),
             ),
             if (others.length > 1) ...<Widget>[

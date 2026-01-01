@@ -8,6 +8,7 @@ import 'package:smooth_app/generic_lib/dialogs/smooth_alert_dialog.dart';
 import 'package:smooth_app/helpers/app_helper.dart';
 import 'package:smooth_app/helpers/launch_url_helper.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
 /// Dialog with a stop button, while a future is running.
 ///
@@ -132,7 +133,7 @@ class LoadingDialog<T> {
           }
 
           return ListTile(
-            leading: const CircularProgressIndicator.adaptive(),
+            leading: const OwnedLoader(size: 36.0),
             title: Text(title),
           );
         },

@@ -6,6 +6,7 @@ import 'package:smooth_app/generic_lib/empty_screen_layout.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/prices/infinite_scroll_manager.dart';
 import 'package:smooth_app/pages/product/query_results_banner.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// A generic stateful widget for infinite scrolling lists that works with InfiniteScrollManager.
 class InfiniteScrollList<T> extends StatefulWidget {
@@ -100,7 +101,7 @@ class _InfiniteScrollListState<T> extends State<InfiniteScrollList<T>> {
   @override
   Widget build(BuildContext context) {
     if (_isInitialLoading) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return const Center(child: CalLoader());
     }
 
     if (_error != null) {
@@ -134,7 +135,7 @@ class _InfiniteScrollListState<T> extends State<InfiniteScrollList<T>> {
       children.add(
         const Padding(
           padding: EdgeInsetsDirectional.symmetric(vertical: LARGE_SPACE),
-          child: Center(child: CircularProgressIndicator.adaptive()),
+          child: Center(child: CalLoader()),
         ),
       );
     }

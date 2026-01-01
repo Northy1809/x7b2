@@ -11,6 +11,7 @@ import 'package:smooth_app/pages/navigator/external_page.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/theme_provider.dart';
 import 'package:smooth_app/widgets/autosize_text.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -102,7 +103,7 @@ class _ExternalPageInAWebViewState extends State<ExternalPageInAWebView> {
           title: Text(widget.pageName ?? AppLocalizations.of(context).loading),
           leading: const SmoothBackButton(),
         ),
-        body: const Center(child: CircularProgressIndicator.adaptive()),
+        body: const Center(child: CalLoader()),
       );
     } else {
       return SmoothScaffold(

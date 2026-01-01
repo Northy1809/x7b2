@@ -6,9 +6,9 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/database/dao_ownership_scan.dart';
 import 'package:smooth_app/database/local_database.dart';
+import 'package:smooth_app/pages/owner/moral_score_page.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/alternatives_section.dart';
-import 'package:smooth_app/pages/product/product_page/overview/ethics_details.dart';
 import 'package:smooth_app/pages/product/product_page/overview/health_details.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/pages/product/product_page/overview/share_card.dart';
@@ -267,14 +267,11 @@ class _OverviewPageState extends State<_OverviewPage> {
                         : null,
                     onMoralTap: ethicsLoading
                         ? null
-                        : () => DetailsPage.open(
+                        : () => MoralScorePage.open(
                             context,
-                            'Moral score',
-                            EthicsDetails(
-                              result: ethics,
-                              ownerName: owner,
-                              db: db,
-                            ),
+                            result: ethics,
+                            ownerName: owner,
+                            db: db,
                           ),
                     onHealthTap: !_showHealth
                         ? null

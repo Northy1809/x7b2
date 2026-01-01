@@ -3,6 +3,7 @@ import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/generic_lib/duration_constants.dart';
 import 'package:smooth_app/generic_lib/widgets/picture_not_found.dart';
 import 'package:smooth_app/generic_lib/widgets/smooth_app_logo.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Container to display a product image on a product card.
 ///
@@ -52,7 +53,7 @@ class SmoothImage extends StatelessWidget {
         errorBuilder: _errorBuilder,
         frameBuilder: (_, Widget child, int? frame, _) {
           if (frame == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CalLoader(size: 16.0, stroke: 2.0));
           }
 
           return child;

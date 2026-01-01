@@ -17,6 +17,7 @@ import 'package:smooth_app/pages/user_management/sign_up_page.dart';
 import 'package:smooth_app/resources/app_icons.dart' as icons;
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_app_bar.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
@@ -254,7 +255,7 @@ class _LoginPageState extends State<LoginPage> with TraceableClientMixin {
 
                                   //Sign in button
                                   if (_runningQuery)
-                                    const CircularProgressIndicator.adaptive()
+                                    const CalLoader()
                                   else
                                     ElevatedButton(
                                       onPressed: () => _login(context),
