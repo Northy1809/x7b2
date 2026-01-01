@@ -41,6 +41,10 @@ class SelfTestItem {
   bool? ok;
   String owner = '';
 
+  /// 25/11: the owner the user would see (from the barcode read, or the
+  /// brand) is the product's real owner.
+  bool? ownerOk;
+
   bool get isBarcode => kind != 'front';
 }
 
@@ -110,6 +114,11 @@ class _ScanSelfTestPageState extends State<ScanSelfTestPage> {
         item.ms = w.elapsedMilliseconds;
         item.got = a.barcode;
         item.how = analyzer.lastRun;
+        final LocalOwnerResult? truth = db.lookup(barcode: item.code, brands: item.brands, countryTags: const <String>['en:denmark']);
+        final String shown = a.barcode != null
+            ? (db.lookup(barcode: a.barcode!, brands: _norm(a.barcode!) == _norm(item.code) ? item.brands : null, countryTags: const <String>['en:denmark'])?.owner ?? '')
+            : (a.brands.isEmpty ? '' : a.brands.first.owner.owner);
+        item.ownerOk = truth == null ? null : OwnershipNorm.normCore(shown) == OwnershipNorm.normCore(truth.owner);
         if (item.isBarcode) {
           item.ok = a.barcode != null && _norm(a.barcode!) == _norm(item.code);
           final LocalOwnerResult? o = db.lookup(barcode: item.code, brands: item.brands, countryTags: const <String>['en:denmark']);
@@ -131,7 +140,7 @@ class _ScanSelfTestPageState extends State<ScanSelfTestPage> {
         item.how = 'error $e';
       }
       _log('${item.ok == true ? 'OK  ' : 'MISS'} ${i + 1}/${_items.length} ${item.kind} ${item.file} '
-          'want=${item.code} got=${item.got ?? '-'} owner="${item.owner}" ms=${item.ms} ${item.how}');
+          'want=${item.code} got=${item.got ?? '-'} owner="${item.owner}" ownerOk=${item.ownerOk} ms=${item.ms} ${item.how}');
       try {
         file.deleteSync();
       } catch (_) {}
@@ -156,7 +165,10 @@ class _ScanSelfTestPageState extends State<ScanSelfTestPage> {
       return '$label $ok/${of.length}';
     }
 
+    final List<SelfTestItem> judged = _items.where((SelfTestItem i) => i.ownerOk != null).toList();
+    final int right = judged.where((SelfTestItem i) => i.ownerOk!).length;
     return <String>[
+      if (judged.isNotEmpty) 'Right owner $right/${judged.length}',
       part('bc', 'Barcode photos'),
       part('hard', 'Hard photos'),
       part('front', 'Fronts'),

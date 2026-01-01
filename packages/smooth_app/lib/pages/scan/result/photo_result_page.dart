@@ -251,7 +251,7 @@ class _PhotoResultPageState extends State<PhotoResultPage> {
       bottomBar: SheetActions(secondary: 'Not right?', onSecondary: _typeBrand),
       slivers: current == null
           ? <Widget>[
-              SliverToBoxAdapter(child: _NothingFound(onType: _typeBrand)),
+              SliverToBoxAdapter(child: _NothingFound(onType: _typeBrand, seenBrand: analysis.seenBrand)),
             ]
           : _found(context, current, analysis),
     );
@@ -490,9 +490,12 @@ class _HealthNeedsBarcode extends StatelessWidget {
 }
 
 class _NothingFound extends StatelessWidget {
-  const _NothingFound({required this.onType});
+  const _NothingFound({required this.onType, this.seenBrand = ''});
 
   final VoidCallback onType;
+
+  /// A brand read on the photo whose owner is not known yet.
+  final String seenBrand;
 
   @override
   Widget build(BuildContext context) {
@@ -503,10 +506,12 @@ class _NothingFound extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text('No brand found', style: theme.textTheme.displaySmall),
+          Text(seenBrand.isEmpty ? 'No brand found' : seenBrand, style: theme.textTheme.displaySmall),
           const SizedBox(height: 6.0),
           Text(
-            'We could not read a brand we know on this photo.',
+            seenBrand.isEmpty
+                ? 'We could not read a brand we know on this photo.'
+                : 'We can see the brand, but we do not know who owns $seenBrand yet. The barcode tells us the exact product.',
             style: theme.textTheme.bodyLarge?.copyWith(color: muted),
           ),
           const SizedBox(height: 20.0),

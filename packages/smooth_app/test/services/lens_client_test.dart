@@ -32,6 +32,18 @@ OwnershipLocalDb _db() => OwnershipLocalDb.fromJson(<String, dynamic>{
 });
 
 void main() {
+  group('LensClient.parseConfig', () {
+    test('one https line, trailing slash dropped', () {
+      expect(LensClient.parseConfig('https://owned-lens.x.workers.dev/\n'), 'https://owned-lens.x.workers.dev');
+    });
+
+    test('not https or garbage: null (the built-in address is used)', () {
+      expect(LensClient.parseConfig('http://evil.example'), isNull);
+      expect(LensClient.parseConfig('<html>404</html>'), isNull);
+      expect(LensClient.parseConfig(''), isNull);
+    });
+  });
+
   group('LensClient.candidates', () {
     test('the brand the model read, owner from the offline table', () {
       final List<BrandCandidate> c = LensClient.candidates(const LensResult(brand: 'Nutella'), _db());
@@ -41,6 +53,26 @@ void main() {
     test('"Coeur de Lion" finds the table\'s "Cœur de Lion"', () {
       final List<BrandCandidate> c = LensClient.candidates(const LensResult(brand: 'Coeur de Lion'), _db());
       expect(c.single.owner.owner, 'Savencia');
+    });
+
+    test('a pack word the table has as a brand owning itself is junk', () {
+      final OwnershipLocalDb db = OwnershipLocalDb.fromJson(<String, dynamic>{
+        'strings': <String>['Tortilla'],
+        'brands': <String, dynamic>{
+          'tortilla': <dynamic>[0, 'w', <int>[0], ''],
+        },
+        'by_country': <String, dynamic>{},
+        'prefix': <String, dynamic>{},
+        'emb': <String, dynamic>{},
+        'companies': <String, dynamic>{},
+      });
+      expect(LensClient.candidates(const LensResult(brand: 'Tortilla'), db, packWords: const <String>{'tortilla'}), isEmpty);
+    });
+
+    test('a pack word with a real owner still counts', () {
+      final List<BrandCandidate> c =
+          LensClient.candidates(const LensResult(brand: 'Nutella'), _db(), packWords: const <String>{'nutella'});
+      expect(c.single.owner.owner, 'Ferrero SpA');
     });
 
     test('an unknown brand gives no owner (the model is never asked for one)', () {
@@ -96,6 +128,17 @@ void main() {
       final PhotoAnalysis a = await analyzer(asked: asked).analyze('x.jpg', liveBarcode: '3017620422003');
       expect(asked, isEmpty);
       expect(a.barcode, '3017620422003');
+    });
+
+    test('a brand with no known owner is kept as seen, the owner never guessed', () async {
+      final PhotoAnalysis a = await analyzer(lens: const LensResult(brand: 'Raw Bite')).analyze('x.jpg');
+      expect(a.brands, isEmpty);
+      expect(a.seenBrand, 'Raw Bite');
+    });
+
+    test('a known brand: no "seen" fallback', () async {
+      final PhotoAnalysis a = await analyzer(lens: const LensResult(brand: 'Nutella')).analyze('x.jpg');
+      expect(a.seenBrand, '');
     });
 
     test('offline (Lens gives nothing): the text reader still answers', () async {

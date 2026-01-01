@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:smooth_app/helpers/gs1_code.dart';
 
@@ -31,12 +32,14 @@ class LiveBarcodeReader {
 
   /// Frames read since [start], for the log.
   int frames = 0;
+  int _ms = 0;
 
   Future<void> start() async {
     _done = false;
     _last = null;
     _seen = 0;
     frames = 0;
+    _ms = 0;
     if (_running) {
       return;
     }
@@ -63,6 +66,7 @@ class LiveBarcodeReader {
       return;
     }
     _busy = true;
+    final Stopwatch watch = Stopwatch()..start();
     try {
       final int format = cameraImageFormat(image);
       if (format == ImageFormat.none) {
@@ -92,6 +96,11 @@ class LiveBarcodeReader {
         ),
       );
       frames++;
+      _ms += watch.elapsedMilliseconds;
+      if (frames == 1 || frames % 30 == 0) {
+        // For the device log: proof the live picture is being read, and how fast.
+        debugPrint('OWNED_LIVE frames=$frames avgMs=${_ms ~/ frames} size=${image.width}x${image.height} read=${result.codes.length}');
+      }
       final String? code = vote(
         <String>[
           for (final Code c in result.codes)

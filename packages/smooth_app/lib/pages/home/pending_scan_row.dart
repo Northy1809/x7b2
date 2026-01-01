@@ -200,9 +200,12 @@ class _Answer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final BrandCandidate? b = brand;
-    final String title = b?.name ?? (scan.analysis?.barcode != null ? 'Barcode found' : "Couldn't read this one");
+    final String seen = scan.analysis?.seenBrand ?? '';
+    final String title =
+        b?.name ?? (scan.analysis?.barcode != null ? 'Barcode found' : (seen.isNotEmpty ? seen : "Couldn't read this one"));
     final String line =
-        b?.owner.owner ?? (scan.analysis?.barcode != null ? 'Tap to see the owner' : 'Tap to try again');
+        b?.owner.owner ??
+        (scan.analysis?.barcode != null ? 'Tap to see the owner' : (seen.isNotEmpty ? 'Owner not known yet' : 'Tap to try again'));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,

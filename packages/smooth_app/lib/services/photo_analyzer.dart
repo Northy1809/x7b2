@@ -18,7 +18,7 @@ import 'package:smooth_app/services/zxing_barcode_reader.dart';
 
 /// What a photo of a pack told us.
 class PhotoAnalysis {
-  const PhotoAnalysis({this.barcode, this.brands = const <BrandCandidate>[]});
+  const PhotoAnalysis({this.barcode, this.brands = const <BrandCandidate>[], this.seenBrand = ''});
 
   /// A barcode in the picture (GTIN): the normal product page answers when
   /// a database knows it; else [brands] (read on the photo, or the barcode
@@ -27,6 +27,10 @@ class PhotoAnalysis {
 
   /// Brands (or the company on the label) with their owner, best first.
   final List<BrandCandidate> brands;
+
+  /// 25/11: the brand Lens read when no owner is known for it ("Raw
+  /// Bite"): shown as seen, with the owner unknown, never guessed.
+  final String seenBrand;
 
   bool get isEmpty => barcode == null && brands.isEmpty;
 }
@@ -158,10 +162,14 @@ class PhotoAnalyzer {
       how = barcode == null ? 'none' : 'clearer';
     }
     String lensSaw = '-';
+    String seenBrand = '';
     if (lensing != null) {
       final LensResult? seen = await lensing;
       if (seen != null) {
         lensSaw = seen.brand.isEmpty ? '?' : seen.brand;
+        if (!OwnershipNorm.stopBrands.contains(OwnershipNorm.normCore(seen.brand))) {
+          seenBrand = seen.brand;
+        }
         final String? digits = LensClient.barcodeOf(seen);
         if (barcode == null && digits != null) {
           barcode = digits;
@@ -169,7 +177,12 @@ class PhotoAnalyzer {
         }
         // What the model named comes first: it reads logos the text reader
         // cannot, and a brand matched in loose text can be wrong.
-        final List<BrandCandidate> named = LensClient.candidates(seen, db, countryTags: countryTags);
+        final List<BrandCandidate> named = LensClient.candidates(
+          seen,
+          db,
+          countryTags: countryTags,
+          packWords: await _safe(_packWords) ?? const <String>{},
+        );
         found.insertAll(0, named);
       }
     }
@@ -196,7 +209,11 @@ class PhotoAnalyzer {
     if (found.isEmpty && barcode == null) {
       found.addAll(await _onlineGuess(text.lines));
     }
-    return PhotoAnalysis(barcode: barcode, brands: _distinctOwners(found));
+    return PhotoAnalysis(
+      barcode: barcode,
+      brands: _distinctOwners(found),
+      seenBrand: found.isEmpty ? seenBrand : '',
+    );
   }
 
   /// What the last [analyze] found and how, for the log and the self-test.

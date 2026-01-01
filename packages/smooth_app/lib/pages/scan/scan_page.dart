@@ -23,6 +23,7 @@ import 'package:smooth_app/pages/scan/result/photo_result_page.dart';
 import 'package:smooth_app/pages/scan/scan_self_test_page.dart';
 import 'package:smooth_app/pages/search/search_page.dart';
 import 'package:smooth_app/pages/search/search_product_helper.dart';
+import 'package:smooth_app/services/lens_client.dart';
 import 'package:smooth_app/services/pending_scans.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
 import 'package:smooth_app/widgets/owned_mark.dart';
@@ -88,6 +89,7 @@ class _ScanPageState extends State<ScanPage> {
   void initState() {
     super.initState();
     _camera.onBarcode = _liveBarcode;
+    LensClient.warmUp();
   }
 
   /// 25/11: the live picture read a barcode: the photo is taken by itself

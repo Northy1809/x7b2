@@ -16,7 +16,7 @@ const DEFAULT = "scout";
 const PROMPT = `You see a photo of a product (food, drink, cosmetics, household).
 Read the pack and answer with JSON only, no other text:
 {"brand": "...", "product": "...", "company": "...", "barcode": "..."}
-- brand: the brand name as printed on the pack (the logo), not a slogan.
+- brand: the brand name as printed on the pack (usually the logo, the biggest name). Never a product type ("Tortilla", "Parmesan"), a quantity ("8x"), a certification or claim ("Bio", "Økologisk", "Organic", "Vegan"), a protected name ("Parmigiano Reggiano", "Feta PDO") or a slogan. If the only name is a supermarket's own label, give that label's name (e.g. "Milbona", "K-Classic", "Salling").
 - product: what it is, short (e.g. "hazelnut spread 400 g").
 - company: the company printed on the label (e.g. after "Manufactured by", "Fabriqué par", "Hergestellt für", "Produceret for"), or "" if none is visible.
 - barcode: the digits printed under a barcode if readable, else "".

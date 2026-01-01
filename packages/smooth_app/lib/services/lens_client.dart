@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -36,28 +37,69 @@ class LensResult {
 /// the offline table that gave the right owner for 104 of the 112 whose
 /// owner is known.
 class LensClient {
-  const LensClient({this.endpoint = defaultEndpoint, this.timeout = const Duration(seconds: 9)});
+  const LensClient({this.endpoint, this.timeout = const Duration(seconds: 9)});
 
   static const String defaultEndpoint = String.fromEnvironment(
     'OWNED_LENS_URL',
-    defaultValue: 'https://owned-lens.ossified-glow.workers.dev',
+    defaultValue: 'https://owned-lens.supreme-naranja.workers.dev',
   );
 
-  final String endpoint;
+  /// 25/11: where the server is now, one line of text. The server can move
+  /// (a new Cloudflare account) without a new app.
+  static const String configUrl = 'https://raw.githubusercontent.com/Northy1809/x7b2/main/l';
+
+  /// null: [current], read from [configUrl].
+  final String? endpoint;
   final Duration timeout;
 
+  static Future<String>? _current;
+
+  /// The server's address: from [configUrl] once per run of the app, else
+  /// [defaultEndpoint].
+  static Future<String> current() => _current ??= _fetch().then((String? u) {
+    if (u == null) {
+      // Ask again on the next scan.
+      _current = null;
+    }
+    return u ?? defaultEndpoint;
+  });
+
+  static Future<String?> _fetch() async {
+    try {
+      final http.Response r = await http.get(Uri.parse(configUrl)).timeout(const Duration(seconds: 4));
+      return r.statusCode == 200 ? parseConfig(r.body) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The address in the config text: one https URL, without a trailing /.
+  static String? parseConfig(final String text) {
+    final String line = text.trim().split('\n').first.trim();
+    final Uri? u = Uri.tryParse(line);
+    if (u == null || u.scheme != 'https' || u.host.isEmpty) {
+      return null;
+    }
+    return line.endsWith('/') ? line.substring(0, line.length - 1) : line;
+  }
+
+  /// Looks the address up before the first photo (the scan page opens).
+  static void warmUp() => unawaited(current());
+
   Future<LensResult?> identify(final String path) async {
+    final Future<String> where = endpoint == null ? current() : Future<String>.value(endpoint);
+    // 1024 px: 107 of 120 brands against 105 at 768 (25/11).
     final List<int>? jpeg = await FlutterImageCompress.compressWithFile(
       path,
-      minWidth: 768,
-      minHeight: 768,
+      minWidth: 1024,
+      minHeight: 1024,
       quality: 85,
     );
     if (jpeg == null) {
       return null;
     }
     final http.Response r = await http
-        .post(Uri.parse('$endpoint/id'), headers: <String, String>{'content-type': 'image/jpeg'}, body: jpeg)
+        .post(Uri.parse('${await where}/id'), headers: <String, String>{'content-type': 'image/jpeg'}, body: jpeg)
         .timeout(timeout);
     if (r.statusCode != 200) {
       return null;
@@ -85,9 +127,11 @@ class LensClient {
     final LensResult r,
     final OwnershipLocalDb? db, {
     final List<String> countryTags = const <String>[],
+    final Set<String> packWords = const <String>{},
   }) {
     final List<BrandCandidate> out = <BrandCandidate>[];
-    if (db != null && r.brand.isNotEmpty) {
+    final String key = OwnershipNorm.normCore(r.brand);
+    if (db != null && r.brand.isNotEmpty && !OwnershipNorm.stopBrands.contains(key)) {
       LocalOwnerResult? byBrand;
       // The model writes "Coeur de Lion"; the table has the pack's "Cœur".
       for (final String spelling in <String>{r.brand, r.brand.replaceAll('oe', 'œ').replaceAll('Oe', 'Œ')}) {
@@ -96,7 +140,12 @@ class LensClient {
           break;
         }
       }
-      if (byBrand != null && byBrand.source != LocalOwnerSource.barcodePrefix) {
+      // A product word read as the brand ("Tortilla") that the table has as
+      // a brand owning itself is junk; a pack word with a real owner
+      // ("Cointreau" -> Rémy Cointreau, "Be-Kind" -> Mars) is not (25/11).
+      final bool junk =
+          byBrand != null && packWords.contains(key) && OwnershipNorm.normCore(byBrand.owner) == key;
+      if (byBrand != null && byBrand.source != LocalOwnerSource.barcodePrefix && !junk) {
         out.add(BrandCandidate(key: OwnershipNorm.normCore(r.brand), name: r.brand, owner: byBrand, score: 1.0));
       }
     }
