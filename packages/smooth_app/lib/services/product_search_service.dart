@@ -128,7 +128,8 @@ class ProductSearchService {
   ProductSearchService({
     http.Client? client,
     this.baseUrl = 'https://search.openfoodfacts.org',
-    this.timeout = const Duration(seconds: 8),
+    // 18/11: a cold first connection on a phone can take more than 8 s.
+    this.timeout = const Duration(seconds: 15),
   }) : _client = client ?? http.Client();
 
   final http.Client _client;
