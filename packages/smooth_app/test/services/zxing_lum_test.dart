@@ -30,11 +30,16 @@ void main() {
     expect(l.stretched().pixels.toSet(), <int>{0, 255});
   });
 
-  test('a phone photo gives six passes, all quick', () {
+  test('a phone photo gives seven passes, all quick', () {
     final Lum full = Lum(Uint8List(2400 * 3200), 2400, 3200);
     final Stopwatch w = Stopwatch()..start();
     final List<Lum> made = <Lum>[for (final Lum Function() p in ZxingBarcodeReader.passes(full)) p()];
-    expect(made, hasLength(6));
+    expect(made, hasLength(7));
     expect(w.elapsedMilliseconds, lessThan(3000));
+  });
+
+  test('a code counts once two passes read it', () {
+    expect(ZxingBarcodeReader.agreedCodes(<String, int>{'3017620422003': 1}), isEmpty);
+    expect(ZxingBarcodeReader.agreedCodes(<String, int>{'3017620422003': 2, '0130640000006': 1}), <String>['3017620422003']);
   });
 }

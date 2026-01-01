@@ -27,8 +27,11 @@ class ZxingBarcodeReader {
     return Isolate.run(() => readBytes(bytes, budgetMs: ms));
   }
 
-  /// Product codes in an encoded image ([bytes]: JPEG, PNG ...). The first
-  /// pass that reads one wins; no new pass starts after [budgetMs].
+  /// Product codes in an encoded image ([bytes]: JPEG, PNG ...): a code
+  /// counts once two passes read it. 25/11: on 82 test photos the first
+  /// pass to read anything was wrong twice (a dark photo gave a valid but
+  /// wrong EAN); two agreeing passes were never wrong and lost 2 of 71.
+  /// No new pass starts after [budgetMs].
   static List<String> readBytes(final Uint8List bytes, {final int budgetMs = 4000}) {
     final Stopwatch watch = Stopwatch()..start();
     final img.Image? decoded = img.decodeImage(bytes);
@@ -37,19 +40,29 @@ class ZxingBarcodeReader {
     }
     final img.Image image = img.bakeOrientation(decoded);
     final Lum full = Lum.of(image);
+    final Map<String, int> seen = <String, int>{};
     for (final Lum Function() pass in passes(full)) {
       if (watch.elapsedMilliseconds > budgetMs) {
         break;
       }
-      final List<String> codes = _read(pass());
-      if (codes.isNotEmpty) {
-        return codes;
+      for (final String code in _read(pass())) {
+        seen[code] = (seen[code] ?? 0) + 1;
+      }
+      final List<String> agreed = agreedCodes(seen);
+      if (agreed.isNotEmpty) {
+        return agreed;
       }
     }
     return const <String>[];
   }
 
-  /// The images read, in order: the whole photo, then 2000, 1400 and 1000
+  /// Codes read by at least two passes.
+  static List<String> agreedCodes(final Map<String, int> seen) => <String>[
+    for (final MapEntry<String, int> e in seen.entries)
+      if (e.value >= 2) e.key,
+  ];
+
+  /// The images read, in order: the whole photo, then 2000, 1600, 1400 and 1000
   /// pixels on the long side (a big, soft barcode reads better small; on
   /// the test photos each size read some the others did not), its middle 60 %
   /// and a band across the middle, contrast stretched (where a barcode is
@@ -60,7 +73,7 @@ class ZxingBarcodeReader {
     final int long = w > h ? w : h;
     return <Lum Function()>[
       () => full,
-      for (final int side in const <int>[2000, 1400, 1000])
+      for (final int side in const <int>[2000, 1600, 1400, 1000])
         if (long > side * 1.15) () => full.fit(side),
       () => full.crop((w * 0.2).round(), (h * 0.2).round(), (w * 0.6).round(), (h * 0.6).round()).stretched(),
       () => full.crop(0, (h * 0.3).round(), w, (h * 0.4).round()).stretched(),

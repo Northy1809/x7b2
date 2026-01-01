@@ -51,6 +51,9 @@ void main() {
       expect(LensClient.barcodeOf(const LensResult(barcode: '3017620422003')), '3017620422003');
       expect(LensClient.barcodeOf(const LensResult(barcode: '3017620422004')), isNull);
       expect(LensClient.barcodeOf(const LensResult()), isNull);
+      // A dropped digit: 12 digits are not padded into a code.
+      expect(LensClient.barcodeOf(const LensResult(barcode: '036000291452')), isNull);
+      expect(LensClient.barcodeOf(const LensResult(barcode: '96385074')), '96385074');
     });
   });
 

@@ -65,9 +65,14 @@ class LensClient {
     return LensResult.fromJson(jsonDecode(utf8.decode(r.bodyBytes)) as Map<String, dynamic>);
   }
 
-  /// The product code the model read under the bars, when its check digit
-  /// is right.
+  /// The product code the model read under the bars: a whole EAN-13 or
+  /// EAN-8 with a right check digit. Other lengths are not trusted: it
+  /// drops digits ("810721998120" for 8010721998120, 25/11), and a padded
+  /// short read passes the check digit one time in ten.
   static String? barcodeOf(final LensResult r) {
+    if (r.barcode.length != 13 && r.barcode.length != 8) {
+      return null;
+    }
     final String? code = Gs1Code.toProductCode(r.barcode);
     return code != null && Gs1Code.hasValidCheckDigit(code) ? code : null;
   }
