@@ -1,0 +1,37 @@
+name: b
+
+on:
+  workflow_dispatch:
+
+jobs:
+  b:
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "FLUTTER_VERSION=$(cat flutter-version.txt)" >> $GITHUB_OUTPUT
+        id: flutter-version
+
+      - uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          flutter-version: ${{ steps.flutter-version.outputs.FLUTTER_VERSION }}
+
+      - run: ci/pub_get.sh
+
+      - run: cd ./packages/smooth_app && dart run rive_native:setup --verbose --clean --platform ios
+
+      - run: cd ./packages/smooth_app/ios && rm -rf Pods && rm -f Podfile.lock && flutter pub get && pod install && cd .. && flutter build ios --release --no-codesign -t lib/entrypoints/ios/main_ios.dart
+
+      - run: |
+          cd ./packages/smooth_app/build/ios/iphoneos
+          mkdir Payload
+          cp -R Runner.app Payload/
+          zip -qr app.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: b
+          path: packages/smooth_app/build/ios/iphoneos/app.ipa
+          retention-days: 1
