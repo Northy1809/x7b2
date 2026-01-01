@@ -1,0 +1,2284 @@
+{
+"items": [
+{
+"file": "7300400129459_bc.jpg",
+"code": "7300400129459",
+"kind": "bc",
+"brands": "wasa"
+},
+{
+"file": "7300400129459_dark.jpg",
+"code": "7300400129459",
+"kind": "hard",
+"brands": "wasa",
+"how": "dark"
+},
+{
+"file": "7300400129459_front.jpg",
+"code": "7300400129459",
+"kind": "front",
+"brands": "wasa"
+},
+{
+"file": "7622201733681_bc.jpg",
+"code": "7622201733681",
+"kind": "bc",
+"brands": "Philadelphia"
+},
+{
+"file": "7622201733681_blur.jpg",
+"code": "7622201733681",
+"kind": "hard",
+"brands": "Philadelphia",
+"how": "blur"
+},
+{
+"file": "7622201733681_front.jpg",
+"code": "7622201733681",
+"kind": "front",
+"brands": "Philadelphia"
+},
+{
+"file": "20004101_bc.jpg",
+"code": "20004101",
+"kind": "bc",
+"brands": "Freshona"
+},
+{
+"file": "20004101_exif90.jpg",
+"code": "20004101",
+"kind": "hard",
+"brands": "Freshona",
+"how": "exif90"
+},
+{
+"file": "20004101_front.jpg",
+"code": "20004101",
+"kind": "front",
+"brands": "Freshona"
+},
+{
+"file": "20067816_bc.jpg",
+"code": "20067816",
+"kind": "bc",
+"brands": "Tastino"
+},
+{
+"file": "20067816_glare.jpg",
+"code": "20067816",
+"kind": "hard",
+"brands": "Tastino",
+"how": "glare"
+},
+{
+"file": "20067816_front.jpg",
+"code": "20067816",
+"kind": "front",
+"brands": "Tastino"
+},
+{
+"file": "5021554989172_bc.jpg",
+"code": "5021554989172",
+"kind": "bc",
+"brands": "Clearspring"
+},
+{
+"file": "5021554989172_tilt.jpg",
+"code": "5021554989172",
+"kind": "hard",
+"brands": "Clearspring",
+"how": "tilt"
+},
+{
+"file": "5021554989172_front.jpg",
+"code": "5021554989172",
+"kind": "front",
+"brands": "Clearspring"
+},
+{
+"file": "5740700995774_bc.jpg",
+"code": "5740700995774",
+"kind": "bc",
+"brands": "Coca-Cola"
+},
+{
+"file": "5740700995774_far.jpg",
+"code": "5740700995774",
+"kind": "hard",
+"brands": "Coca-Cola",
+"how": "far"
+},
+{
+"file": "5740700995774_front.jpg",
+"code": "5740700995774",
+"kind": "front",
+"brands": "Coca-Cola"
+},
+{
+"file": "5000159532921_bc.jpg",
+"code": "5000159532921",
+"kind": "bc",
+"brands": "BE-KIND"
+},
+{
+"file": "5000159532921_dark.jpg",
+"code": "5000159532921",
+"kind": "hard",
+"brands": "BE-KIND",
+"how": "dark"
+},
+{
+"file": "5000159532921_front.jpg",
+"code": "5000159532921",
+"kind": "front",
+"brands": "BE-KIND"
+},
+{
+"file": "5740700982972_bc.jpg",
+"code": "5740700982972",
+"kind": "bc",
+"brands": "Coca-Cola"
+},
+{
+"file": "5740700982972_blur.jpg",
+"code": "5740700982972",
+"kind": "hard",
+"brands": "Coca-Cola",
+"how": "blur"
+},
+{
+"file": "5740700982972_front.jpg",
+"code": "5740700982972",
+"kind": "front",
+"brands": "Coca-Cola"
+},
+{
+"file": "7300400118408_bc.jpg",
+"code": "7300400118408",
+"kind": "bc",
+"brands": "wasa"
+},
+{
+"file": "7300400118408_exif90.jpg",
+"code": "7300400118408",
+"kind": "hard",
+"brands": "wasa",
+"how": "exif90"
+},
+{
+"file": "7300400118408_front.jpg",
+"code": "7300400118408",
+"kind": "front",
+"brands": "wasa"
+},
+{
+"file": "5711953175152_bc.jpg",
+"code": "5711953175152",
+"kind": "bc",
+"brands": "Arla Foods A.m.b.a"
+},
+{
+"file": "5711953175152_glare.jpg",
+"code": "5711953175152",
+"kind": "hard",
+"brands": "Arla Foods A.m.b.a",
+"how": "glare"
+},
+{
+"file": "5711953175152_front.jpg",
+"code": "5711953175152",
+"kind": "front",
+"brands": "Arla Foods A.m.b.a"
+},
+{
+"file": "5412514930141_bc.jpg",
+"code": "5412514930141",
+"kind": "bc",
+"brands": "Acapulco, Snack Food Poco Loco, bio organic"
+},
+{
+"file": "5412514930141_tilt.jpg",
+"code": "5412514930141",
+"kind": "hard",
+"brands": "Acapulco, Snack Food Poco Loco, bio organic",
+"how": "tilt"
+},
+{
+"file": "5412514930141_front.jpg",
+"code": "5412514930141",
+"kind": "front",
+"brands": "Acapulco, Snack Food Poco Loco, bio organic"
+},
+{
+"file": "3161910238710_bc.jpg",
+"code": "3161910238710",
+"kind": "bc",
+"brands": "Cœur de Lion"
+},
+{
+"file": "3161910238710_far.jpg",
+"code": "3161910238710",
+"kind": "hard",
+"brands": "Cœur de Lion",
+"how": "far"
+},
+{
+"file": "3161910238710_front.jpg",
+"code": "3161910238710",
+"kind": "front",
+"brands": "Cœur de Lion"
+},
+{
+"file": "20272760_bc.jpg",
+"code": "20272760",
+"kind": "bc",
+"brands": "Krüger, Ludwig Schokolade, Mister Choc"
+},
+{
+"file": "20272760_dark.jpg",
+"code": "20272760",
+"kind": "hard",
+"brands": "Krüger, Ludwig Schokolade, Mister Choc",
+"how": "dark"
+},
+{
+"file": "20272760_front.jpg",
+"code": "20272760",
+"kind": "front",
+"brands": "Krüger, Ludwig Schokolade, Mister Choc"
+},
+{
+"file": "4000417222008_bc.jpg",
+"code": "4000417222008",
+"kind": "bc",
+"brands": "Ritter Sport, Ritter Sport Bunte Vielfalt"
+},
+{
+"file": "4000417222008_blur.jpg",
+"code": "4000417222008",
+"kind": "hard",
+"brands": "Ritter Sport, Ritter Sport Bunte Vielfalt",
+"how": "blur"
+},
+{
+"file": "4000417222008_front.jpg",
+"code": "4000417222008",
+"kind": "front",
+"brands": "Ritter Sport, Ritter Sport Bunte Vielfalt"
+},
+{
+"file": "5711953011399_bc.jpg",
+"code": "5711953011399",
+"kind": "bc",
+"brands": "Cheasy"
+},
+{
+"file": "5711953011399_exif90.jpg",
+"code": "5711953011399",
+"kind": "hard",
+"brands": "Cheasy",
+"how": "exif90"
+},
+{
+"file": "5711953011399_front.jpg",
+"code": "5711953011399",
+"kind": "front",
+"brands": "Cheasy"
+},
+{
+"file": "90357985_bc.jpg",
+"code": "90357985",
+"kind": "bc",
+"brands": "Coca-Cola"
+},
+{
+"file": "90357985_glare.jpg",
+"code": "90357985",
+"kind": "hard",
+"brands": "Coca-Cola",
+"how": "glare"
+},
+{
+"file": "90357985_front.jpg",
+"code": "90357985",
+"kind": "front",
+"brands": "Coca-Cola"
+},
+{
+"file": "20045197_bc.jpg",
+"code": "20045197",
+"kind": "bc",
+"brands": "Milbona, Lidl"
+},
+{
+"file": "20045197_tilt.jpg",
+"code": "20045197",
+"kind": "hard",
+"brands": "Milbona, Lidl",
+"how": "tilt"
+},
+{
+"file": "20045197_front.jpg",
+"code": "20045197",
+"kind": "front",
+"brands": "Milbona, Lidl"
+},
+{
+"file": "5411188100324_bc.jpg",
+"code": "5411188100324",
+"kind": "bc",
+"brands": "alpro"
+},
+{
+"file": "5411188100324_far.jpg",
+"code": "5411188100324",
+"kind": "hard",
+"brands": "alpro",
+"how": "far"
+},
+{
+"file": "5411188100324_front.jpg",
+"code": "5411188100324",
+"kind": "front",
+"brands": "alpro"
+},
+{
+"file": "5700426101019_bc.jpg",
+"code": "5700426101019",
+"kind": "bc",
+"brands": "Arla"
+},
+{
+"file": "5700426101019_dark.jpg",
+"code": "5700426101019",
+"kind": "hard",
+"brands": "Arla",
+"how": "dark"
+},
+{
+"file": "5700426101019_front.jpg",
+"code": "5700426101019",
+"kind": "front",
+"brands": "Arla"
+},
+{
+"file": "8715035230309_bc.jpg",
+"code": "8715035230309",
+"kind": "bc",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K."
+},
+{
+"file": "8715035230309_blur.jpg",
+"code": "8715035230309",
+"kind": "hard",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K.",
+"how": "blur"
+},
+{
+"file": "8715035230309_front.jpg",
+"code": "8715035230309",
+"kind": "front",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K."
+},
+{
+"file": "0087666052802_bc.jpg",
+"code": "0087666052802",
+"kind": "bc",
+"brands": "FLYING GOOSE"
+},
+{
+"file": "0087666052802_exif90.jpg",
+"code": "0087666052802",
+"kind": "hard",
+"brands": "FLYING GOOSE",
+"how": "exif90"
+},
+{
+"file": "0087666052802_front.jpg",
+"code": "0087666052802",
+"kind": "front",
+"brands": "FLYING GOOSE"
+},
+{
+"file": "8002710402008_bc.jpg",
+"code": "8002710402008",
+"kind": "bc",
+"brands": "Zanetti"
+},
+{
+"file": "8002710402008_glare.jpg",
+"code": "8002710402008",
+"kind": "hard",
+"brands": "Zanetti",
+"how": "glare"
+},
+{
+"file": "8002710402008_front.jpg",
+"code": "8002710402008",
+"kind": "front",
+"brands": "Zanetti"
+},
+{
+"file": "4011800563516_bc.jpg",
+"code": "4011800563516",
+"kind": "bc",
+"brands": "Corny"
+},
+{
+"file": "4011800563516_tilt.jpg",
+"code": "4011800563516",
+"kind": "hard",
+"brands": "Corny",
+"how": "tilt"
+},
+{
+"file": "4011800563516_front.jpg",
+"code": "4011800563516",
+"kind": "front",
+"brands": "Corny"
+},
+{
+"file": "8691707090122_bc.jpg",
+"code": "8691707090122",
+"kind": "bc",
+"brands": "Ozmo"
+},
+{
+"file": "8691707090122_far.jpg",
+"code": "8691707090122",
+"kind": "hard",
+"brands": "Ozmo",
+"how": "far"
+},
+{
+"file": "8691707090122_front.jpg",
+"code": "8691707090122",
+"kind": "front",
+"brands": "Ozmo"
+},
+{
+"file": "3035542004206_bc.jpg",
+"code": "3035542004206",
+"kind": "bc",
+"brands": "Cointreau, Cointreau"
+},
+{
+"file": "3035542004206_dark.jpg",
+"code": "3035542004206",
+"kind": "hard",
+"brands": "Cointreau, Cointreau",
+"how": "dark"
+},
+{
+"file": "3035542004206_front.jpg",
+"code": "3035542004206",
+"kind": "front",
+"brands": "Cointreau, Cointreau"
+},
+{
+"file": "4008400395029_bc.jpg",
+"code": "4008400395029",
+"kind": "bc",
+"brands": "Tic Tac"
+},
+{
+"file": "4008400395029_blur.jpg",
+"code": "4008400395029",
+"kind": "hard",
+"brands": "Tic Tac",
+"how": "blur"
+},
+{
+"file": "4008400395029_front.jpg",
+"code": "4008400395029",
+"kind": "front",
+"brands": "Tic Tac"
+},
+{
+"file": "75032814_bc.jpg",
+"code": "75032814",
+"kind": "bc",
+"brands": "Corona"
+},
+{
+"file": "75032814_exif90.jpg",
+"code": "75032814",
+"kind": "hard",
+"brands": "Corona",
+"how": "exif90"
+},
+{
+"file": "75032814_front.jpg",
+"code": "75032814",
+"kind": "front",
+"brands": "Corona"
+},
+{
+"file": "7394376615665_bc.jpg",
+"code": "7394376615665",
+"kind": "bc",
+"brands": "Oatly, Oatly norway"
+},
+{
+"file": "7394376615665_glare.jpg",
+"code": "7394376615665",
+"kind": "hard",
+"brands": "Oatly, Oatly norway",
+"how": "glare"
+},
+{
+"file": "7394376615665_front.jpg",
+"code": "7394376615665",
+"kind": "front",
+"brands": "Oatly, Oatly norway"
+},
+{
+"file": "8000430058765_bc.jpg",
+"code": "8000430058765",
+"kind": "bc",
+"brands": "Galbani"
+},
+{
+"file": "8000430058765_tilt.jpg",
+"code": "8000430058765",
+"kind": "hard",
+"brands": "Galbani",
+"how": "tilt"
+},
+{
+"file": "8000430058765_front.jpg",
+"code": "8000430058765",
+"kind": "front",
+"brands": "Galbani"
+},
+{
+"file": "5701205009939_bc.jpg",
+"code": "5701205009939",
+"kind": "bc",
+"brands": "Schulstad"
+},
+{
+"file": "5701205009939_far.jpg",
+"code": "5701205009939",
+"kind": "hard",
+"brands": "Schulstad",
+"how": "far"
+},
+{
+"file": "5701205009939_front.jpg",
+"code": "5701205009939",
+"kind": "front",
+"brands": "Schulstad"
+},
+{
+"file": "5021554989196_bc.jpg",
+"code": "5021554989196",
+"kind": "bc",
+"brands": "Clearspring"
+},
+{
+"file": "5021554989196_dark.jpg",
+"code": "5021554989196",
+"kind": "hard",
+"brands": "Clearspring",
+"how": "dark"
+},
+{
+"file": "5021554989196_front.jpg",
+"code": "5021554989196",
+"kind": "front",
+"brands": "Clearspring"
+},
+{
+"file": "8010721998120_bc.jpg",
+"code": "8010721998120",
+"kind": "bc",
+"brands": "parmareggio"
+},
+{
+"file": "8010721998120_blur.jpg",
+"code": "8010721998120",
+"kind": "hard",
+"brands": "parmareggio",
+"how": "blur"
+},
+{
+"file": "8010721998120_front.jpg",
+"code": "8010721998120",
+"kind": "front",
+"brands": "parmareggio"
+},
+{
+"file": "5711953084676_bc.jpg",
+"code": "5711953084676",
+"kind": "bc",
+"brands": "Arla Klovborg"
+},
+{
+"file": "5711953084676_exif90.jpg",
+"code": "5711953084676",
+"kind": "hard",
+"brands": "Arla Klovborg",
+"how": "exif90"
+},
+{
+"file": "5711953084676_front.jpg",
+"code": "5711953084676",
+"kind": "front",
+"brands": "Arla Klovborg"
+},
+{
+"file": "5000159461122_bc.jpg",
+"code": "5000159461122",
+"kind": "bc",
+"brands": "Mars Wrigley Confectionery UK Limited, Snickers"
+},
+{
+"file": "5000159461122_glare.jpg",
+"code": "5000159461122",
+"kind": "hard",
+"brands": "Mars Wrigley Confectionery UK Limited, Snickers",
+"how": "glare"
+},
+{
+"file": "5000159461122_front.jpg",
+"code": "5000159461122",
+"kind": "front",
+"brands": "Mars Wrigley Confectionery UK Limited, Snickers"
+},
+{
+"file": "5000111001540_bc.jpg",
+"code": "5000111001540",
+"kind": "bc",
+"brands": "Lea & Perrins"
+},
+{
+"file": "5000111001540_tilt.jpg",
+"code": "5000111001540",
+"kind": "hard",
+"brands": "Lea & Perrins",
+"how": "tilt"
+},
+{
+"file": "5000111001540_front.jpg",
+"code": "5000111001540",
+"kind": "front",
+"brands": "Lea & Perrins"
+},
+{
+"file": "5410316671118_bc.jpg",
+"code": "5410316671118",
+"kind": "bc",
+"brands": "Smirnoff"
+},
+{
+"file": "5410316671118_far.jpg",
+"code": "5410316671118",
+"kind": "hard",
+"brands": "Smirnoff",
+"how": "far"
+},
+{
+"file": "5410316671118_front.jpg",
+"code": "5410316671118",
+"kind": "front",
+"brands": "Smirnoff"
+},
+{
+"file": "5701029160823_bc.jpg",
+"code": "5701029160823",
+"kind": "bc",
+"brands": "Axa"
+},
+{
+"file": "5701029160823_dark.jpg",
+"code": "5701029160823",
+"kind": "hard",
+"brands": "Axa",
+"how": "dark"
+},
+{
+"file": "5701029160823_front.jpg",
+"code": "5701029160823",
+"kind": "front",
+"brands": "Axa"
+},
+{
+"file": "5707381001507_bc.jpg",
+"code": "5707381001507",
+"kind": "bc",
+"brands": "Machandel"
+},
+{
+"file": "5707381001507_blur.jpg",
+"code": "5707381001507",
+"kind": "hard",
+"brands": "Machandel",
+"how": "blur"
+},
+{
+"file": "5707381001507_front.jpg",
+"code": "5707381001507",
+"kind": "front",
+"brands": "Machandel"
+},
+{
+"file": "5700426291154_bc.jpg",
+"code": "5700426291154",
+"kind": "bc",
+"brands": "Arla"
+},
+{
+"file": "5700426291154_exif90.jpg",
+"code": "5700426291154",
+"kind": "hard",
+"brands": "Arla",
+"how": "exif90"
+},
+{
+"file": "5700426291154_front.jpg",
+"code": "5700426291154",
+"kind": "front",
+"brands": "Arla"
+},
+{
+"file": "4000417237002_bc.jpg",
+"code": "4000417237002",
+"kind": "bc",
+"brands": "RITTER SPORT"
+},
+{
+"file": "4000417237002_glare.jpg",
+"code": "4000417237002",
+"kind": "hard",
+"brands": "RITTER SPORT",
+"how": "glare"
+},
+{
+"file": "4000417237002_front.jpg",
+"code": "4000417237002",
+"kind": "front",
+"brands": "RITTER SPORT"
+},
+{
+"file": "5711953153846_bc.jpg",
+"code": "5711953153846",
+"kind": "bc",
+"brands": "Arla"
+},
+{
+"file": "5711953153846_tilt.jpg",
+"code": "5711953153846",
+"kind": "hard",
+"brands": "Arla",
+"how": "tilt"
+},
+{
+"file": "5711953153846_front.jpg",
+"code": "5711953153846",
+"kind": "front",
+"brands": "Arla"
+},
+{
+"file": "5745000657391_bc.jpg",
+"code": "5745000657391",
+"kind": "bc",
+"brands": "True Dates"
+},
+{
+"file": "5745000657391_far.jpg",
+"code": "5745000657391",
+"kind": "hard",
+"brands": "True Dates",
+"how": "far"
+},
+{
+"file": "5745000657391_front.jpg",
+"code": "5745000657391",
+"kind": "front",
+"brands": "True Dates"
+},
+{
+"file": "20060039_bc.jpg",
+"code": "20060039",
+"kind": "bc",
+"brands": "Culinea, McEnnedy"
+},
+{
+"file": "20060039_dark.jpg",
+"code": "20060039",
+"kind": "hard",
+"brands": "Culinea, McEnnedy",
+"how": "dark"
+},
+{
+"file": "20060039_front.jpg",
+"code": "20060039",
+"kind": "front",
+"brands": "Culinea, McEnnedy"
+},
+{
+"file": "4000417013002_bc.jpg",
+"code": "4000417013002",
+"kind": "bc",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000417013002_blur.jpg",
+"code": "4000417013002",
+"kind": "hard",
+"brands": "Ritter Sport",
+"how": "blur"
+},
+{
+"file": "4000417013002_front.jpg",
+"code": "4000417013002",
+"kind": "front",
+"brands": "Ritter Sport"
+},
+{
+"file": "5000159489171_bc.jpg",
+"code": "5000159489171",
+"kind": "bc",
+"brands": "M&ms"
+},
+{
+"file": "5000159489171_exif90.jpg",
+"code": "5000159489171",
+"kind": "hard",
+"brands": "M&ms",
+"how": "exif90"
+},
+{
+"file": "5000159489171_front.jpg",
+"code": "5000159489171",
+"kind": "front",
+"brands": "M&ms"
+},
+{
+"file": "5700426260907_bc.jpg",
+"code": "5700426260907",
+"kind": "bc",
+"brands": "Cheasy"
+},
+{
+"file": "5700426260907_glare.jpg",
+"code": "5700426260907",
+"kind": "hard",
+"brands": "Cheasy",
+"how": "glare"
+},
+{
+"file": "5700426260907_front.jpg",
+"code": "5700426260907",
+"kind": "front",
+"brands": "Cheasy"
+},
+{
+"file": "5700426291383_bc.jpg",
+"code": "5700426291383",
+"kind": "bc",
+"brands": "Arla"
+},
+{
+"file": "5700426291383_tilt.jpg",
+"code": "5700426291383",
+"kind": "hard",
+"brands": "Arla",
+"how": "tilt"
+},
+{
+"file": "5700426291383_front.jpg",
+"code": "5700426291383",
+"kind": "front",
+"brands": "Arla"
+},
+{
+"file": "5701043000303_bc.jpg",
+"code": "5701043000303",
+"kind": "bc",
+"brands": "Ama"
+},
+{
+"file": "5701043000303_far.jpg",
+"code": "5701043000303",
+"kind": "hard",
+"brands": "Ama",
+"how": "far"
+},
+{
+"file": "5701043000303_front.jpg",
+"code": "5701043000303",
+"kind": "front",
+"brands": "Ama"
+},
+{
+"file": "20379773_bc.jpg",
+"code": "20379773",
+"kind": "bc",
+"brands": "Baresa"
+},
+{
+"file": "20379773_dark.jpg",
+"code": "20379773",
+"kind": "hard",
+"brands": "Baresa",
+"how": "dark"
+},
+{
+"file": "20379773_front.jpg",
+"code": "20379773",
+"kind": "front",
+"brands": "Baresa"
+},
+{
+"file": "20516901_bc.jpg",
+"code": "20516901",
+"kind": "bc",
+"brands": "Milbona"
+},
+{
+"file": "20516901_blur.jpg",
+"code": "20516901",
+"kind": "hard",
+"brands": "Milbona",
+"how": "blur"
+},
+{
+"file": "20516901_front.jpg",
+"code": "20516901",
+"kind": "front",
+"brands": "Milbona"
+},
+{
+"file": "8718951672963_bc.jpg",
+"code": "8718951672963",
+"kind": "bc",
+"brands": ""
+},
+{
+"file": "8718951672963_exif90.jpg",
+"code": "8718951672963",
+"kind": "hard",
+"brands": "",
+"how": "exif90"
+},
+{
+"file": "8718951672963_front.jpg",
+"code": "8718951672963",
+"kind": "front",
+"brands": ""
+},
+{
+"file": "5744001420980_bc.jpg",
+"code": "5744001420980",
+"kind": "bc",
+"brands": "THE ORGANIC CRAVE"
+},
+{
+"file": "5744001420980_glare.jpg",
+"code": "5744001420980",
+"kind": "hard",
+"brands": "THE ORGANIC CRAVE",
+"how": "glare"
+},
+{
+"file": "5744001420980_front.jpg",
+"code": "5744001420980",
+"kind": "front",
+"brands": "THE ORGANIC CRAVE"
+},
+{
+"file": "20095253_bc.jpg",
+"code": "20095253",
+"kind": "bc",
+"brands": "Sol&Mar, Lidl, Nixe"
+},
+{
+"file": "20095253_tilt.jpg",
+"code": "20095253",
+"kind": "hard",
+"brands": "Sol&Mar, Lidl, Nixe",
+"how": "tilt"
+},
+{
+"file": "20095253_front.jpg",
+"code": "20095253",
+"kind": "front",
+"brands": "Sol&Mar, Lidl, Nixe"
+},
+{
+"file": "4014400905359_bc.jpg",
+"code": "4014400905359",
+"kind": "bc",
+"brands": "Storck"
+},
+{
+"file": "4014400905359_far.jpg",
+"code": "4014400905359",
+"kind": "hard",
+"brands": "Storck",
+"how": "far"
+},
+{
+"file": "4014400905359_front.jpg",
+"code": "4014400905359",
+"kind": "front",
+"brands": "Storck"
+},
+{
+"file": "8016438001016_bc.jpg",
+"code": "8016438001016",
+"kind": "bc",
+"brands": "limoChef"
+},
+{
+"file": "8016438001016_dark.jpg",
+"code": "8016438001016",
+"kind": "hard",
+"brands": "limoChef",
+"how": "dark"
+},
+{
+"file": "8016438001016_front.jpg",
+"code": "8016438001016",
+"kind": "front",
+"brands": "limoChef"
+},
+{
+"file": "87313277_bc.jpg",
+"code": "87313277",
+"kind": "bc",
+"brands": "Barkleys, Tuttle & Co."
+},
+{
+"file": "87313277_blur.jpg",
+"code": "87313277",
+"kind": "hard",
+"brands": "Barkleys, Tuttle & Co.",
+"how": "blur"
+},
+{
+"file": "87313277_front.jpg",
+"code": "87313277",
+"kind": "front",
+"brands": "Barkleys, Tuttle & Co."
+},
+{
+"file": "7640170370058_bc.jpg",
+"code": "7640170370058",
+"kind": "bc",
+"brands": "Biomed, ООО &quot;Органик-Фармасьютикалз&quot;"
+},
+{
+"file": "7640170370058_exif90.jpg",
+"code": "7640170370058",
+"kind": "hard",
+"brands": "Biomed, ООО &quot;Органик-Фармасьютикалз&quot;",
+"how": "exif90"
+},
+{
+"file": "7640170370058_front.jpg",
+"code": "7640170370058",
+"kind": "front",
+"brands": "Biomed, ООО &quot;Органик-Фармасьютикалз&quot;"
+},
+{
+"file": "20005733_bc.jpg",
+"code": "20005733",
+"kind": "bc",
+"brands": "Alesto"
+},
+{
+"file": "20005733_glare.jpg",
+"code": "20005733",
+"kind": "hard",
+"brands": "Alesto",
+"how": "glare"
+},
+{
+"file": "20005733_front.jpg",
+"code": "20005733",
+"kind": "front",
+"brands": "Alesto"
+},
+{
+"file": "3046920028004_bc.jpg",
+"code": "3046920028004",
+"kind": "bc",
+"brands": "Lindt"
+},
+{
+"file": "3046920028004_tilt.jpg",
+"code": "3046920028004",
+"kind": "hard",
+"brands": "Lindt",
+"how": "tilt"
+},
+{
+"file": "3046920028004_front.jpg",
+"code": "3046920028004",
+"kind": "front",
+"brands": "Lindt"
+},
+{
+"file": "5060042641000_bc.jpg",
+"code": "5060042641000",
+"kind": "bc",
+"brands": "Tyrrells"
+},
+{
+"file": "5060042641000_far.jpg",
+"code": "5060042641000",
+"kind": "hard",
+"brands": "Tyrrells",
+"how": "far"
+},
+{
+"file": "5060042641000_front.jpg",
+"code": "5060042641000",
+"kind": "front",
+"brands": "Tyrrells"
+},
+{
+"file": "8076809513388_bc.jpg",
+"code": "8076809513388",
+"kind": "bc",
+"brands": "Barilla, Barilla G. e R. Fratelli SpA"
+},
+{
+"file": "8076809513388_dark.jpg",
+"code": "8076809513388",
+"kind": "hard",
+"brands": "Barilla, Barilla G. e R. Fratelli SpA",
+"how": "dark"
+},
+{
+"file": "8076809513388_front.jpg",
+"code": "8076809513388",
+"kind": "front",
+"brands": "Barilla, Barilla G. e R. Fratelli SpA"
+},
+{
+"file": "8852018101024_bc.jpg",
+"code": "8852018101024",
+"kind": "bc",
+"brands": "YumYum"
+},
+{
+"file": "8852018101024_blur.jpg",
+"code": "8852018101024",
+"kind": "hard",
+"brands": "YumYum",
+"how": "blur"
+},
+{
+"file": "8852018101024_front.jpg",
+"code": "8852018101024",
+"kind": "front",
+"brands": "YumYum"
+},
+{
+"file": "5053827199568_bc.jpg",
+"code": "5053827199568",
+"kind": "bc",
+"brands": "Kellogg's"
+},
+{
+"file": "5053827199568_exif90.jpg",
+"code": "5053827199568",
+"kind": "hard",
+"brands": "Kellogg's",
+"how": "exif90"
+},
+{
+"file": "5053827199568_front.jpg",
+"code": "5053827199568",
+"kind": "front",
+"brands": "Kellogg's"
+},
+{
+"file": "4008400163826_bc.jpg",
+"code": "4008400163826",
+"kind": "bc",
+"brands": "Ferrero"
+},
+{
+"file": "4008400163826_glare.jpg",
+"code": "4008400163826",
+"kind": "hard",
+"brands": "Ferrero",
+"how": "glare"
+},
+{
+"file": "4008400163826_front.jpg",
+"code": "4008400163826",
+"kind": "front",
+"brands": "Ferrero"
+},
+{
+"file": "4056489406679_bc.jpg",
+"code": "4056489406679",
+"kind": "bc",
+"brands": "Envia"
+},
+{
+"file": "4056489406679_tilt.jpg",
+"code": "4056489406679",
+"kind": "hard",
+"brands": "Envia",
+"how": "tilt"
+},
+{
+"file": "4056489406679_front.jpg",
+"code": "4056489406679",
+"kind": "front",
+"brands": "Envia"
+},
+{
+"file": "3046920029674_bc.jpg",
+"code": "3046920029674",
+"kind": "bc",
+"brands": "LINDT SPRUNGLI SAS"
+},
+{
+"file": "3046920029674_far.jpg",
+"code": "3046920029674",
+"kind": "hard",
+"brands": "LINDT SPRUNGLI SAS",
+"how": "far"
+},
+{
+"file": "3046920029674_front.jpg",
+"code": "3046920029674",
+"kind": "front",
+"brands": "LINDT SPRUNGLI SAS"
+},
+{
+"file": "8715700016504_bc.jpg",
+"code": "8715700016504",
+"kind": "bc",
+"brands": "Heinz"
+},
+{
+"file": "8715700016504_dark.jpg",
+"code": "8715700016504",
+"kind": "hard",
+"brands": "Heinz",
+"how": "dark"
+},
+{
+"file": "8715700016504_front.jpg",
+"code": "8715700016504",
+"kind": "front",
+"brands": "Heinz"
+},
+{
+"file": "5000184321064_bc.jpg",
+"code": "5000184321064",
+"kind": "bc",
+"brands": "Hellmann's"
+},
+{
+"file": "5000184321064_blur.jpg",
+"code": "5000184321064",
+"kind": "hard",
+"brands": "Hellmann's",
+"how": "blur"
+},
+{
+"file": "5000184321064_front.jpg",
+"code": "5000184321064",
+"kind": "front",
+"brands": "Hellmann's"
+},
+{
+"file": "4008400409627_bc.jpg",
+"code": "4008400409627",
+"kind": "bc",
+"brands": "Ferrero"
+},
+{
+"file": "4008400409627_exif90.jpg",
+"code": "4008400409627",
+"kind": "hard",
+"brands": "Ferrero",
+"how": "exif90"
+},
+{
+"file": "4008400409627_front.jpg",
+"code": "4008400409627",
+"kind": "front",
+"brands": "Ferrero"
+},
+{
+"file": "4056489009191_bc.jpg",
+"code": "4056489009191",
+"kind": "bc",
+"brands": "LIDL"
+},
+{
+"file": "4056489009191_glare.jpg",
+"code": "4056489009191",
+"kind": "hard",
+"brands": "LIDL",
+"how": "glare"
+},
+{
+"file": "4056489009191_front.jpg",
+"code": "4056489009191",
+"kind": "front",
+"brands": "LIDL"
+},
+{
+"file": "5000157062673_bc.jpg",
+"code": "5000157062673",
+"kind": "bc",
+"brands": "Heinz"
+},
+{
+"file": "5000157062673_tilt.jpg",
+"code": "5000157062673",
+"kind": "hard",
+"brands": "Heinz",
+"how": "tilt"
+},
+{
+"file": "5000157062673_front.jpg",
+"code": "5000157062673",
+"kind": "front",
+"brands": "Heinz"
+},
+{
+"file": "3023260005872_bc.jpg",
+"code": "3023260005872",
+"kind": "bc",
+"brands": "Salakis"
+},
+{
+"file": "3023260005872_far.jpg",
+"code": "3023260005872",
+"kind": "hard",
+"brands": "Salakis",
+"how": "far"
+},
+{
+"file": "3023260005872_front.jpg",
+"code": "3023260005872",
+"kind": "front",
+"brands": "Salakis"
+},
+{
+"file": "5701977000097_bc.jpg",
+"code": "5701977000097",
+"kind": "bc",
+"brands": "Naturli'"
+},
+{
+"file": "5701977000097_dark.jpg",
+"code": "5701977000097",
+"kind": "hard",
+"brands": "Naturli'",
+"how": "dark"
+},
+{
+"file": "5701977000097_front.jpg",
+"code": "5701977000097",
+"kind": "front",
+"brands": "Naturli'"
+},
+{
+"file": "87157239_bc.jpg",
+"code": "87157239",
+"kind": "bc",
+"brands": "Heinz"
+},
+{
+"file": "87157239_blur.jpg",
+"code": "87157239",
+"kind": "hard",
+"brands": "Heinz",
+"how": "blur"
+},
+{
+"file": "87157239_front.jpg",
+"code": "87157239",
+"kind": "front",
+"brands": "Heinz"
+},
+{
+"file": "8715035210301_bc.jpg",
+"code": "8715035210301",
+"kind": "bc",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K."
+},
+{
+"file": "8715035210301_exif90.jpg",
+"code": "8715035210301",
+"kind": "hard",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K.",
+"how": "exif90"
+},
+{
+"file": "8715035210301_front.jpg",
+"code": "8715035210301",
+"kind": "front",
+"brands": "Kikkoman, Kikkoman - Kikkoman K.K."
+},
+{
+"file": "20664459_bc.jpg",
+"code": "20664459",
+"kind": "bc",
+"brands": "Milbona"
+},
+{
+"file": "20664459_glare.jpg",
+"code": "20664459",
+"kind": "hard",
+"brands": "Milbona",
+"how": "glare"
+},
+{
+"file": "20664459_front.jpg",
+"code": "20664459",
+"kind": "front",
+"brands": "Milbona"
+},
+{
+"file": "4000607852008_bc.jpg",
+"code": "4000607852008",
+"kind": "bc",
+"brands": "Schogetten"
+},
+{
+"file": "4000607852008_tilt.jpg",
+"code": "4000607852008",
+"kind": "hard",
+"brands": "Schogetten",
+"how": "tilt"
+},
+{
+"file": "4000607852008_front.jpg",
+"code": "4000607852008",
+"kind": "front",
+"brands": "Schogetten"
+},
+{
+"file": "4000339697908_bc.jpg",
+"code": "4000339697908",
+"kind": "bc",
+"brands": "Philadelphia"
+},
+{
+"file": "4000339697908_far.jpg",
+"code": "4000339697908",
+"kind": "hard",
+"brands": "Philadelphia",
+"how": "far"
+},
+{
+"file": "4000339697908_front.jpg",
+"code": "4000339697908",
+"kind": "front",
+"brands": "Philadelphia"
+},
+{
+"file": "8005110060007_bc.jpg",
+"code": "8005110060007",
+"kind": "bc",
+"brands": "Mutti"
+},
+{
+"file": "8005110060007_dark.jpg",
+"code": "8005110060007",
+"kind": "hard",
+"brands": "Mutti",
+"how": "dark"
+},
+{
+"file": "8005110060007_front.jpg",
+"code": "8005110060007",
+"kind": "front",
+"brands": "Mutti"
+},
+{
+"file": "8410000810004_bc.jpg",
+"code": "8410000810004",
+"kind": "bc",
+"brands": "Oreo"
+},
+{
+"file": "8410000810004_blur.jpg",
+"code": "8410000810004",
+"kind": "hard",
+"brands": "Oreo",
+"how": "blur"
+},
+{
+"file": "8410000810004_front.jpg",
+"code": "8410000810004",
+"kind": "front",
+"brands": "Oreo"
+},
+{
+"file": "7610400070577_bc.jpg",
+"code": "7610400070577",
+"kind": "bc",
+"brands": "Lindtt EXCELLENCE"
+},
+{
+"file": "7610400070577_exif90.jpg",
+"code": "7610400070577",
+"kind": "hard",
+"brands": "Lindtt EXCELLENCE",
+"how": "exif90"
+},
+{
+"file": "7610400070577_front.jpg",
+"code": "7610400070577",
+"kind": "front",
+"brands": "Lindtt EXCELLENCE"
+},
+{
+"file": "8715035150300_bc.jpg",
+"code": "8715035150300",
+"kind": "bc",
+"brands": "Kikkoman, Kikkoman"
+},
+{
+"file": "8715035150300_glare.jpg",
+"code": "8715035150300",
+"kind": "hard",
+"brands": "Kikkoman, Kikkoman",
+"how": "glare"
+},
+{
+"file": "8715035150300_front.jpg",
+"code": "8715035150300",
+"kind": "front",
+"brands": "Kikkoman, Kikkoman"
+},
+{
+"file": "5011013100156_bc.jpg",
+"code": "5011013100156",
+"kind": "bc",
+"brands": "Baileys"
+},
+{
+"file": "5011013100156_tilt.jpg",
+"code": "5011013100156",
+"kind": "hard",
+"brands": "Baileys",
+"how": "tilt"
+},
+{
+"file": "5011013100156_front.jpg",
+"code": "5011013100156",
+"kind": "front",
+"brands": "Baileys"
+},
+{
+"file": "5021554987710_bc.jpg",
+"code": "5021554987710",
+"kind": "bc",
+"brands": "Clearspring"
+},
+{
+"file": "5021554987710_far.jpg",
+"code": "5021554987710",
+"kind": "hard",
+"brands": "Clearspring",
+"how": "far"
+},
+{
+"file": "5021554987710_front.jpg",
+"code": "5021554987710",
+"kind": "front",
+"brands": "Clearspring"
+},
+{
+"file": "3083681163155_bc.jpg",
+"code": "3083681163155",
+"kind": "bc",
+"brands": "Bonduelle"
+},
+{
+"file": "3083681163155_dark.jpg",
+"code": "3083681163155",
+"kind": "hard",
+"brands": "Bonduelle",
+"how": "dark"
+},
+{
+"file": "3083681163155_front.jpg",
+"code": "3083681163155",
+"kind": "front",
+"brands": "Bonduelle"
+},
+{
+"file": "8008698004630_bc.jpg",
+"code": "8008698004630",
+"kind": "bc",
+"brands": "Dr. Schär"
+},
+{
+"file": "8008698004630_blur.jpg",
+"code": "8008698004630",
+"kind": "hard",
+"brands": "Dr. Schär",
+"how": "blur"
+},
+{
+"file": "8008698004630_front.jpg",
+"code": "8008698004630",
+"kind": "front",
+"brands": "Dr. Schär"
+},
+{
+"file": "4000417025005_bc.jpg",
+"code": "4000417025005",
+"kind": "bc",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000417025005_exif90.jpg",
+"code": "4000417025005",
+"kind": "hard",
+"brands": "Ritter Sport",
+"how": "exif90"
+},
+{
+"file": "4000417025005_front.jpg",
+"code": "4000417025005",
+"kind": "front",
+"brands": "Ritter Sport"
+},
+{
+"file": "4056489108160_bc.jpg",
+"code": "4056489108160",
+"kind": "bc",
+"brands": "Milbona, Pilos"
+},
+{
+"file": "4056489108160_glare.jpg",
+"code": "4056489108160",
+"kind": "hard",
+"brands": "Milbona, Pilos",
+"how": "glare"
+},
+{
+"file": "4056489108160_front.jpg",
+"code": "4056489108160",
+"kind": "front",
+"brands": "Milbona, Pilos"
+},
+{
+"file": "8801073113428_bc.jpg",
+"code": "8801073113428",
+"kind": "bc",
+"brands": "Samyang"
+},
+{
+"file": "8801073113428_tilt.jpg",
+"code": "8801073113428",
+"kind": "hard",
+"brands": "Samyang",
+"how": "tilt"
+},
+{
+"file": "8801073113428_front.jpg",
+"code": "8801073113428",
+"kind": "front",
+"brands": "Samyang"
+},
+{
+"file": "4000417026002_bc.jpg",
+"code": "4000417026002",
+"kind": "bc",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000417026002_far.jpg",
+"code": "4000417026002",
+"kind": "hard",
+"brands": "Ritter Sport",
+"how": "far"
+},
+{
+"file": "4000417026002_front.jpg",
+"code": "4000417026002",
+"kind": "front",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000607851001_bc.jpg",
+"code": "4000607851001",
+"kind": "bc",
+"brands": "Schogetten"
+},
+{
+"file": "4000607851001_dark.jpg",
+"code": "4000607851001",
+"kind": "hard",
+"brands": "Schogetten",
+"how": "dark"
+},
+{
+"file": "4000607851001_front.jpg",
+"code": "4000607851001",
+"kind": "front",
+"brands": "Schogetten"
+},
+{
+"file": "76145513_bc.jpg",
+"code": "76145513",
+"kind": "bc",
+"brands": "Toblerone"
+},
+{
+"file": "76145513_blur.jpg",
+"code": "76145513",
+"kind": "hard",
+"brands": "Toblerone",
+"how": "blur"
+},
+{
+"file": "76145513_front.jpg",
+"code": "76145513",
+"kind": "front",
+"brands": "Toblerone"
+},
+{
+"file": "5740900403376_bc.jpg",
+"code": "5740900403376",
+"kind": "bc",
+"brands": "Lurpak"
+},
+{
+"file": "5740900403376_exif90.jpg",
+"code": "5740900403376",
+"kind": "hard",
+"brands": "Lurpak",
+"how": "exif90"
+},
+{
+"file": "5740900403376_front.jpg",
+"code": "5740900403376",
+"kind": "front",
+"brands": "Lurpak"
+},
+{
+"file": "5000112545326_bc.jpg",
+"code": "5000112545326",
+"kind": "bc",
+"brands": "Coca-Cola Europacific Partners Services Bulgaria EOOD"
+},
+{
+"file": "5000112545326_glare.jpg",
+"code": "5000112545326",
+"kind": "hard",
+"brands": "Coca-Cola Europacific Partners Services Bulgaria EOOD",
+"how": "glare"
+},
+{
+"file": "5000112545326_front.jpg",
+"code": "5000112545326",
+"kind": "front",
+"brands": "Coca-Cola Europacific Partners Services Bulgaria EOOD"
+},
+{
+"file": "4000417214003_bc.jpg",
+"code": "4000417214003",
+"kind": "bc",
+"brands": "Alfred Ritter"
+},
+{
+"file": "4000417214003_tilt.jpg",
+"code": "4000417214003",
+"kind": "hard",
+"brands": "Alfred Ritter",
+"how": "tilt"
+},
+{
+"file": "4000417214003_front.jpg",
+"code": "4000417214003",
+"kind": "front",
+"brands": "Alfred Ritter"
+},
+{
+"file": "5202390021510_bc.jpg",
+"code": "5202390021510",
+"kind": "bc",
+"brands": "Violife, ARIVIA FOOD LIMITED LIABILITY COMPANY"
+},
+{
+"file": "5202390021510_far.jpg",
+"code": "5202390021510",
+"kind": "hard",
+"brands": "Violife, ARIVIA FOOD LIMITED LIABILITY COMPANY",
+"how": "far"
+},
+{
+"file": "5202390021510_front.jpg",
+"code": "5202390021510",
+"kind": "front",
+"brands": "Violife, ARIVIA FOOD LIMITED LIABILITY COMPANY"
+},
+{
+"file": "3155250343302_bc.jpg",
+"code": "3155250343302",
+"kind": "bc",
+"brands": "Président, Rondelé"
+},
+{
+"file": "3155250343302_dark.jpg",
+"code": "3155250343302",
+"kind": "hard",
+"brands": "Président, Rondelé",
+"how": "dark"
+},
+{
+"file": "3155250343302_front.jpg",
+"code": "3155250343302",
+"kind": "front",
+"brands": "Président, Rondelé"
+},
+{
+"file": "5053990127641_bc.jpg",
+"code": "5053990127641",
+"kind": "bc",
+"brands": "Pringles"
+},
+{
+"file": "5053990127641_blur.jpg",
+"code": "5053990127641",
+"kind": "hard",
+"brands": "Pringles",
+"how": "blur"
+},
+{
+"file": "5053990127641_front.jpg",
+"code": "5053990127641",
+"kind": "front",
+"brands": "Pringles"
+},
+{
+"file": "7311311020599_bc.jpg",
+"code": "7311311020599",
+"kind": "bc",
+"brands": "Santa Maria"
+},
+{
+"file": "7311311020599_exif90.jpg",
+"code": "7311311020599",
+"kind": "hard",
+"brands": "Santa Maria",
+"how": "exif90"
+},
+{
+"file": "7311311020599_front.jpg",
+"code": "7311311020599",
+"kind": "front",
+"brands": "Santa Maria"
+},
+{
+"file": "30087040_bc.jpg",
+"code": "30087040",
+"kind": "bc",
+"brands": "Président"
+},
+{
+"file": "30087040_glare.jpg",
+"code": "30087040",
+"kind": "hard",
+"brands": "Président",
+"how": "glare"
+},
+{
+"file": "30087040_front.jpg",
+"code": "30087040",
+"kind": "front",
+"brands": "Président"
+},
+{
+"file": "4000417224002_bc.jpg",
+"code": "4000417224002",
+"kind": "bc",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000417224002_tilt.jpg",
+"code": "4000417224002",
+"kind": "hard",
+"brands": "Ritter Sport",
+"how": "tilt"
+},
+{
+"file": "4000417224002_front.jpg",
+"code": "4000417224002",
+"kind": "front",
+"brands": "Ritter Sport"
+},
+{
+"file": "20830410_bc.jpg",
+"code": "20830410",
+"kind": "bc",
+"brands": "Dulano"
+},
+{
+"file": "20830410_far.jpg",
+"code": "20830410",
+"kind": "hard",
+"brands": "Dulano",
+"how": "far"
+},
+{
+"file": "20830410_front.jpg",
+"code": "20830410",
+"kind": "front",
+"brands": "Dulano"
+},
+{
+"file": "3228021950051_bc.jpg",
+"code": "3228021950051",
+"kind": "bc",
+"brands": "Président"
+},
+{
+"file": "3228021950051_dark.jpg",
+"code": "3228021950051",
+"kind": "hard",
+"brands": "Président",
+"how": "dark"
+},
+{
+"file": "3228021950051_front.jpg",
+"code": "3228021950051",
+"kind": "front",
+"brands": "Président"
+},
+{
+"file": "5701205008994_bc.jpg",
+"code": "5701205008994",
+"kind": "bc",
+"brands": "Schulstad"
+},
+{
+"file": "5701205008994_blur.jpg",
+"code": "5701205008994",
+"kind": "hard",
+"brands": "Schulstad",
+"how": "blur"
+},
+{
+"file": "5701205008994_front.jpg",
+"code": "5701205008994",
+"kind": "front",
+"brands": "Schulstad"
+},
+{
+"file": "5010106113127_bc.jpg",
+"code": "5010106113127",
+"kind": "bc",
+"brands": "Ballantine's"
+},
+{
+"file": "5010106113127_exif90.jpg",
+"code": "5010106113127",
+"kind": "hard",
+"brands": "Ballantine's",
+"how": "exif90"
+},
+{
+"file": "5010106113127_front.jpg",
+"code": "5010106113127",
+"kind": "front",
+"brands": "Ballantine's"
+},
+{
+"file": "5741000119020_bc.jpg",
+"code": "5741000119020",
+"kind": "bc",
+"brands": "Pepsi"
+},
+{
+"file": "5741000119020_glare.jpg",
+"code": "5741000119020",
+"kind": "hard",
+"brands": "Pepsi",
+"how": "glare"
+},
+{
+"file": "5741000119020_front.jpg",
+"code": "5741000119020",
+"kind": "front",
+"brands": "Pepsi"
+},
+{
+"file": "5900783009960_bc.jpg",
+"code": "5900783009960",
+"kind": "bc",
+"brands": "Pudliszki"
+},
+{
+"file": "5900783009960_tilt.jpg",
+"code": "5900783009960",
+"kind": "hard",
+"brands": "Pudliszki",
+"how": "tilt"
+},
+{
+"file": "5900783009960_front.jpg",
+"code": "5900783009960",
+"kind": "front",
+"brands": "Pudliszki"
+},
+{
+"file": "4056489168096_bc.jpg",
+"code": "4056489168096",
+"kind": "bc",
+"brands": "Kania"
+},
+{
+"file": "4056489168096_far.jpg",
+"code": "4056489168096",
+"kind": "hard",
+"brands": "Kania",
+"how": "far"
+},
+{
+"file": "4056489168096_front.jpg",
+"code": "4056489168096",
+"kind": "front",
+"brands": "Kania"
+},
+{
+"file": "5000159484695_bc.jpg",
+"code": "5000159484695",
+"kind": "bc",
+"brands": "Twix"
+},
+{
+"file": "5000159484695_dark.jpg",
+"code": "5000159484695",
+"kind": "hard",
+"brands": "Twix",
+"how": "dark"
+},
+{
+"file": "5000159484695_front.jpg",
+"code": "5000159484695",
+"kind": "front",
+"brands": "Twix"
+},
+{
+"file": "3431410132000_bc.jpg",
+"code": "3431410132000",
+"kind": "bc",
+"brands": "Gavottes"
+},
+{
+"file": "3431410132000_blur.jpg",
+"code": "3431410132000",
+"kind": "hard",
+"brands": "Gavottes",
+"how": "blur"
+},
+{
+"file": "3431410132000_front.jpg",
+"code": "3431410132000",
+"kind": "front",
+"brands": "Gavottes"
+},
+{
+"file": "5700419083360_bc.jpg",
+"code": "5700419083360",
+"kind": "bc",
+"brands": "Philadelphia"
+},
+{
+"file": "5700419083360_exif90.jpg",
+"code": "5700419083360",
+"kind": "hard",
+"brands": "Philadelphia",
+"how": "exif90"
+},
+{
+"file": "5700419083360_front.jpg",
+"code": "5700419083360",
+"kind": "front",
+"brands": "Philadelphia"
+},
+{
+"file": "8008698005286_bc.jpg",
+"code": "8008698005286",
+"kind": "bc",
+"brands": "Schär"
+},
+{
+"file": "8008698005286_glare.jpg",
+"code": "8008698005286",
+"kind": "hard",
+"brands": "Schär",
+"how": "glare"
+},
+{
+"file": "8008698005286_front.jpg",
+"code": "8008698005286",
+"kind": "front",
+"brands": "Schär"
+},
+{
+"file": "4014400900651_bc.jpg",
+"code": "4014400900651",
+"kind": "bc",
+"brands": "Storck"
+},
+{
+"file": "4014400900651_tilt.jpg",
+"code": "4014400900651",
+"kind": "hard",
+"brands": "Storck",
+"how": "tilt"
+},
+{
+"file": "4014400900651_front.jpg",
+"code": "4014400900651",
+"kind": "front",
+"brands": "Storck"
+},
+{
+"file": "20112745_bc.jpg",
+"code": "20112745",
+"kind": "bc",
+"brands": "Golden Sun, Golden Sun / Lidl, Taste of Lidl"
+},
+{
+"file": "20112745_far.jpg",
+"code": "20112745",
+"kind": "hard",
+"brands": "Golden Sun, Golden Sun / Lidl, Taste of Lidl",
+"how": "far"
+},
+{
+"file": "20112745_front.jpg",
+"code": "20112745",
+"kind": "front",
+"brands": "Golden Sun, Golden Sun / Lidl, Taste of Lidl"
+},
+{
+"file": "5701872203005_bc.jpg",
+"code": "5701872203005",
+"kind": "bc",
+"brands": "Coca-Cola"
+},
+{
+"file": "5701872203005_dark.jpg",
+"code": "5701872203005",
+"kind": "hard",
+"brands": "Coca-Cola",
+"how": "dark"
+},
+{
+"file": "5701872203005_front.jpg",
+"code": "5701872203005",
+"kind": "front",
+"brands": "Coca-Cola"
+},
+{
+"file": "5760466904919_bc.jpg",
+"code": "5760466904919",
+"kind": "bc",
+"brands": "Kærgården"
+},
+{
+"file": "5760466904919_blur.jpg",
+"code": "5760466904919",
+"kind": "hard",
+"brands": "Kærgården",
+"how": "blur"
+},
+{
+"file": "5760466904919_front.jpg",
+"code": "5760466904919",
+"kind": "front",
+"brands": "Kærgården"
+},
+{
+"file": "4000417019004_bc.jpg",
+"code": "4000417019004",
+"kind": "bc",
+"brands": "Ritter Sport"
+},
+{
+"file": "4000417019004_exif90.jpg",
+"code": "4000417019004",
+"kind": "hard",
+"brands": "Ritter Sport",
+"how": "exif90"
+},
+{
+"file": "4000417019004_front.jpg",
+"code": "4000417019004",
+"kind": "front",
+"brands": "Ritter Sport"
+},
+{
+"file": "5012427142701_bc.jpg",
+"code": "5012427142701",
+"kind": "bc",
+"brands": "Baxters"
+},
+{
+"file": "5012427142701_glare.jpg",
+"code": "5012427142701",
+"kind": "hard",
+"brands": "Baxters",
+"how": "glare"
+},
+{
+"file": "5012427142701_front.jpg",
+"code": "5012427142701",
+"kind": "front",
+"brands": "Baxters"
+},
+{
+"file": "5712840020012_bc.jpg",
+"code": "5712840020012",
+"kind": "bc",
+"brands": "Raw-Bite"
+},
+{
+"file": "5712840020012_tilt.jpg",
+"code": "5712840020012",
+"kind": "hard",
+"brands": "Raw-Bite",
+"how": "tilt"
+},
+{
+"file": "5712840020012_front.jpg",
+"code": "5712840020012",
+"kind": "front",
+"brands": "Raw-Bite"
+},
+{
+"file": "5740700996153_bc.jpg",
+"code": "5740700996153",
+"kind": "bc",
+"brands": "Fanta, Fanta - The Coca Cola Company"
+},
+{
+"file": "5740700996153_far.jpg",
+"code": "5740700996153",
+"kind": "hard",
+"brands": "Fanta, Fanta - The Coca Cola Company",
+"how": "far"
+},
+{
+"file": "5740700996153_front.jpg",
+"code": "5740700996153",
+"kind": "front",
+"brands": "Fanta, Fanta - The Coca Cola Company"
+}
+]
+}
