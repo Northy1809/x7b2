@@ -78,10 +78,13 @@ class ProductPageState extends State<ProductPage>
 
     onNextFrame(() {
       if (KnowledgePanelsBuilder.needsSimplifiedPanelsRefresh(widget.product)) {
+        // 17/11: quietly, without Open Food Facts' "Refreshing" dialog or an
+        // error dialog when the server is busy (429): the page already
+        // shows what is known, and the rest fills in when it arrives.
         unawaited(
-          ProductRefresher().fetchAndRefresh(
+          ProductRefresher().silentFetchAndRefresh(
             barcode: barcode,
-            context: context,
+            localDatabase: localDatabase,
           ),
         );
       }

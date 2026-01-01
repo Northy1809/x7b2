@@ -3,24 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/data_models/fetched_product.dart';
+import 'package:smooth_app/database/dao_product.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/common/product_refresher.dart';
 import 'package:smooth_app/pages/product/product_page/tabs/ownership/barcode_owner_hint.dart';
 import 'package:smooth_app/pages/product/product_page/tabs/ownership/unknown_barcode_ownership_card.dart';
+import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/widgets/cal_ui.dart';
 
-/// A page to show when a [Product] is not in the database
-/// This page shouldn't be opened directly, it's only for deep links
+/// Opens a product by barcode: from the phone's cache at once, else from
+/// Open Food Facts. When the server says no (not found, or 429 "Too Many
+/// Requests", which Open Food Facts answers after a handful of quick
+/// lookups) and the caller already knows something about the product (a
+/// search hit's name, brand and photo: [fallback]), that opens instead of
+/// an error page (17/11). The full data then arrives in the background.
 class ProductLoaderPage extends StatefulWidget {
   const ProductLoaderPage({
     required this.barcode,
     required this.mode,
+    this.fallback,
+    this.fetch,
+    this.onOpen,
     super.key,
   }) : assert(barcode != '');
 
   final String barcode;
   final ProductLoaderMode mode;
+
+  /// What the caller knows already (a search hit), shown if the server fails.
+  final Product? fallback;
+
+  /// For tests: replaces the cache + server lookup.
+  final Future<FetchedProduct> Function(String barcode)? fetch;
+
+  /// For tests: replaces opening the product page.
+  final void Function(Product product)? onOpen;
 
   @override
   State<ProductLoaderPage> createState() => _ProductLoaderPageState();
@@ -28,6 +46,9 @@ class ProductLoaderPage extends StatefulWidget {
 
 class _ProductLoaderPageState extends State<ProductLoaderPage> {
   _ProductLoaderState _state = _ProductLoaderState.loading;
+
+  /// One quiet retry after a "Too Many Requests" or a network hiccup.
+  static const Duration _retryAfter = Duration(milliseconds: 1500);
 
   @override
   void initState() {
@@ -38,47 +59,91 @@ class _ProductLoaderPageState extends State<ProductLoaderPage> {
     });
   }
 
-  Future<void> _loadProduct() async {
+  Future<FetchedProduct> _fetchOnce() async {
+    if (widget.fetch != null) {
+      return widget.fetch!(widget.barcode);
+    }
+    try {
+      return await ProductRefresher()
+          .silentFetchAndRefresh(barcode: widget.barcode, localDatabase: context.read<LocalDatabase>())
+          .timeout(const Duration(seconds: 20));
+    } catch (e) {
+      return FetchedProduct.error(exceptionString: e.toString(), isConnected: true);
+    }
+  }
+
+  void _open(final Product product) {
+    if (widget.onOpen != null) {
+      widget.onOpen!(product);
+      return;
+    }
     final AppNavigator navigator = AppNavigator.of(context);
+    if (widget.mode == ProductLoaderMode.editProduct) {
+      navigator.pushReplacement(AppRoutes.PRODUCT_EDITOR(widget.barcode), extra: product);
+      return;
+    }
+    navigator.pushReplacement(
+      AppRoutes.PRODUCT(widget.barcode, heroTag: 'product_${widget.barcode}'),
+      extra: product,
+    );
+  }
+
+  Future<void> _loadProduct() async {
     setState(() {
       _state = _ProductLoaderState.loading;
     });
 
-    final FetchedProduct fetchedProduct = await ProductRefresher()
-        .silentFetchAndRefresh(
-          barcode: widget.barcode,
-          localDatabase: context.read<LocalDatabase>(),
-        );
-
-    if (mounted) {
-      if (fetchedProduct.product != null) {
-        if (widget.mode == ProductLoaderMode.viewProduct) {
-          navigator.pushReplacement(
-            AppRoutes.PRODUCT(
-              widget.barcode,
-              heroTag: 'product_${widget.barcode}',
-            ),
-            extra: fetchedProduct.product,
-          );
-        } else if (widget.mode == ProductLoaderMode.editProduct) {
-          navigator.pushReplacement(
-            AppRoutes.PRODUCT_EDITOR(widget.barcode),
-            extra: fetchedProduct.product,
-          );
-        }
+    // Seen before: open at once (the product page refreshes it quietly).
+    if (widget.fetch == null && widget.mode == ProductLoaderMode.viewProduct) {
+      Product? cached;
+      try {
+        cached = await DaoProduct(context.read<LocalDatabase>()).get(widget.barcode);
+      } catch (_) {}
+      if (!mounted) {
         return;
       }
-      if (fetchedProduct.status == FetchedProductStatus.internetNotFound) {
-        setState(() {
-          _state = _ProductLoaderState.productNotFound;
-        });
+      if (cached != null) {
+        _open(cached);
         return;
       }
-      setState(() {
-        // TODO(monsieurtanuki): put more details from FetchedProduct?
-        _state = _ProductLoaderState.serverError;
-      });
     }
+
+    FetchedProduct fetched = await _fetchOnce();
+    if (fetched.product == null && fetched.status == FetchedProductStatus.internetError) {
+      await Future<void>.delayed(_retryAfter);
+      if (!mounted) {
+        return;
+      }
+      fetched = await _fetchOnce();
+    }
+    if (!mounted) {
+      return;
+    }
+    if (fetched.product != null) {
+      _open(fetched.product!);
+      return;
+    }
+    final Product? fallback = widget.mode == ProductLoaderMode.viewProduct ? widget.fallback : null;
+    if (fallback != null) {
+      // Kept, so it shows in "Recently scanned"; the product page fills in
+      // the rest from the server later.
+      if (widget.fetch == null) {
+        try {
+          await DaoProduct(
+            context.read<LocalDatabase>(),
+          ).put(fallback, ProductQuery.getLanguage(), productType: fallback.productType ?? ProductType.food);
+        } catch (_) {}
+      }
+      if (mounted) {
+        _open(fallback);
+      }
+      return;
+    }
+    setState(() {
+      _state = fetched.status == FetchedProductStatus.internetNotFound
+          ? _ProductLoaderState.productNotFound
+          : _ProductLoaderState.serverError;
+    });
   }
 
   @override
@@ -156,7 +221,7 @@ class _ProductLoaderNetworkErrorState extends StatelessWidget {
       CalEmpty(
         icon: CupertinoIcons.wifi_slash,
         title: 'Could not load the product',
-        body: 'Check your connection and try again. What Owned knows without the internet:',
+        body: 'The product database did not answer. Try again in a moment. What Owned knows without it:',
         action: 'Try again',
         onAction: onRetry,
       ),

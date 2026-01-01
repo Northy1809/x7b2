@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
-/// The logo mark (ring in the scan frame's corners) next to "Owned.".
-/// Ink on light backgrounds by default; pass white for a dark one.
+/// The logo mark (open ring and dot in the scan frame's corners) next to
+/// "Owned.". Ink on light backgrounds by default; pass white for a dark one.
+/// [motion] plays the mark's intro (home, launch) or keeps it moving.
 class OwnedWordmark extends StatelessWidget {
-  const OwnedWordmark({this.height = 40.0, this.color = BrandColors.ink, super.key});
+  const OwnedWordmark({
+    this.height = 40.0,
+    this.color = BrandColors.ink,
+    this.motion = OwnedMarkMotion.none,
+    super.key,
+  });
 
   final double height;
   final Color color;
+  final OwnedMarkMotion motion;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -17,12 +24,7 @@ class OwnedWordmark extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SvgPicture.asset(
-          color.computeLuminance() > 0.5
-              ? 'assets/app/release_icon_dark_transparent_no_border.svg'
-              : 'assets/app/release_icon_light_transparent_no_border.svg',
-          height: height * 1.25,
-        ),
+        OwnedMark(size: height * 1.25, color: color, motion: motion),
         SizedBox(width: height * 0.12),
         Text(
           'Owned.',

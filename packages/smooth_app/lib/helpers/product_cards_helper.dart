@@ -6,6 +6,7 @@ import 'package:smooth_app/database/transient_file.dart';
 import 'package:smooth_app/generic_lib/buttons/smooth_large_button_with_icon.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/image_field_extension.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/helpers/ui_helpers.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/query/product_query.dart';
@@ -49,7 +50,7 @@ String? _clearString(final String? string) {
   if (string.trim().isEmpty) {
     return null;
   }
-  return string.trim();
+  return string.trim().capFirst();
 }
 
 String getProductName(

@@ -212,6 +212,8 @@ class _SmoothGoRouter {
                   mode: state.uri.queryParameters['edit'] == 'true'
                       ? ProductLoaderMode.editProduct
                       : ProductLoaderMode.viewProduct,
+                  // What the caller knows (a search hit), if the server fails.
+                  fallback: state.extra is Product ? state.extra! as Product : null,
                 );
               },
             ),
@@ -576,7 +578,7 @@ class AppRoutes {
   static String SEARCH({
     ProductPageTransition? transition = ProductPageTransition.standard,
   }) =>
-      '/${_InternalAppRoutes.SEARCH_PAGE}?transition=${Uri.encodeQueryComponent(transition?.name ?? '')}}';
+      '/${_InternalAppRoutes.SEARCH_PAGE}?transition=${Uri.encodeQueryComponent(transition?.name ?? '')}';
 
   // Guide for NutriScore V2
   static String get GUIDE_NUTRISCORE_V2 =>

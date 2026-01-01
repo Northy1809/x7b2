@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
+import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/product_page/overview/product_overview.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/services/avoided_owners.dart';
@@ -148,14 +150,14 @@ class SearchHitTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        hit.name ?? hit.barcode,
+                        (hit.name ?? hit.barcode).capFirst(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15.0, letterSpacing: -0.2),
                       ),
                       if (subtitle.isNotEmpty)
                         Text(
-                          subtitle,
+                          subtitle.capFirst(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),
@@ -172,7 +174,7 @@ class SearchHitTile extends StatelessWidget {
                             const SizedBox(width: 6.0),
                             Flexible(
                               child: Text(
-                                avoided ? 'You avoid $owner' : owner,
+                                avoided ? 'You avoid $owner' : owner.capFirst(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.titleMedium?.copyWith(
@@ -256,3 +258,32 @@ class OwnerInfo {
   /// Every name the owner goes by (display, database, chain, controller).
   final List<String> names;
 }
+
+/// What a search hit already says about the product, as a [Product]: shown
+/// at once if Open Food Facts is slow or says "Too Many Requests" (17/11).
+Product productFromHit(final SearchHit hit) => Product(
+  barcode: hit.barcode,
+  productName: hit.name,
+  brands: hit.brands.isEmpty ? null : hit.brands.join(', '),
+  quantity: hit.quantity,
+  imageFrontUrl: hit.imageUrl,
+  imageFrontSmallUrl: hit.imageUrl,
+  countriesTags: hit.countriesTags.isEmpty ? null : hit.countriesTags,
+)
+  ..productType = ProductType.food
+  ..nutriscore = hit.nutriscoreGrade;
+
+/// Opens a search hit's product page (through the loader, with the hit as
+/// the fallback), from the suggestions and the results alike.
+void openSearchHit(final BuildContext context, final SearchHit hit) {
+  FocusManager.instance.primaryFocus?.unfocus();
+  if (debugOpenSearchHit != null) {
+    debugOpenSearchHit!(hit);
+    return;
+  }
+  AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(hit.barcode), extra: productFromHit(hit));
+}
+
+/// For tests: called instead of the router when set.
+@visibleForTesting
+void Function(SearchHit hit)? debugOpenSearchHit;

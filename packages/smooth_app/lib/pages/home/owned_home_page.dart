@@ -8,8 +8,10 @@ import 'package:smooth_app/database/dao_product_last_access.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/generic_lib/widgets/owned_wordmark.dart';
 import 'package:smooth_app/helpers/haptics.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/companies/avoid_list.dart';
 import 'package:smooth_app/pages/history_page.dart';
+import 'package:smooth_app/pages/home/home_scanner_card.dart';
 import 'package:smooth_app/pages/home/pending_scan_row.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
@@ -24,6 +26,7 @@ import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
 import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
 /// Everything the home page shows, worked out from the scan history.
 class HomeSummary {
@@ -103,15 +106,19 @@ class HomeSummary {
 }
 
 /// The home tab, laid out as Cal AI's and sized from its App Store
-/// screenshot (research/ui/CALAI.md, 393 pt wide): wordmark and streak, the
-/// week, swipeable pages of one big ring card over three small ones with
-/// dots under them, and the latest scans as photo rows. The camera opens
-/// from the black + button.
+/// screenshot (research/ui/CALAI.md, 393 pt wide): wordmark and avoid pill,
+/// the scanner card (17/11), the companies strip, swipeable pages of one big
+/// ring card over three small ones with dots under them, and the latest
+/// scans as photo rows. The camera opens from the scanner card and from the
+/// black + button's menu.
 class OwnedHomePage extends StatefulWidget {
-  const OwnedHomePage({this.load, super.key});
+  const OwnedHomePage({this.load, this.onScan, super.key});
 
   /// For tests.
   final Future<HomeSummary> Function()? load;
+
+  /// For tests: what the scanner card does (opens the camera when null).
+  final VoidCallback? onScan;
 
   @override
   State<OwnedHomePage> createState() => _OwnedHomePageState();
@@ -196,6 +203,9 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
               children: <Widget>[
                 const FadeUpIn(index: 0, child: Padding(padding: inset, child: _Header())),
                 const SizedBox(height: 16.0),
+                // 17/11: the scanner first, the app's main action.
+                FadeUpIn(index: 1, child: Padding(padding: inset, child: HomeScannerCard(onOpen: widget.onScan))),
+                const SizedBox(height: 14.0),
                 FadeUpIn(index: 1, child: _CompanyStrip(summary: s)),
                 const SizedBox(height: 6.0),
                 FadeUpIn(
@@ -386,7 +396,7 @@ class _Header extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     return Row(
       children: <Widget>[
-        OwnedWordmark(height: 27.0, color: theme.colorScheme.onSurface),
+        OwnedWordmark(height: 27.0, color: theme.colorScheme.onSurface, motion: OwnedMarkMotion.intro),
         const Spacer(),
         ListenableBuilder(
           listenable: AvoidedOwners.instance,
@@ -513,7 +523,7 @@ class _CompanyDot extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                tally.owner,
+                tally.owner.capFirst(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textScaler: TextScaler.noScaling,
@@ -734,6 +744,7 @@ class ScanRow extends StatelessWidget {
     final String name = (product.productName?.trim().isNotEmpty ?? false)
         ? product.productName!.trim()
         : (product.brands ?? product.barcode ?? '');
+    final String shownName = name.capFirst();
     final int? health = (product.productType ?? ProductType.food) == ProductType.food
         ? HealthScore.fromProduct(product).score
         : null;
@@ -788,7 +799,7 @@ class ScanRow extends StatelessWidget {
                         Padding(
                           padding: EdgeInsetsDirectional.only(end: time == null ? 0.0 : 58.0),
                           child: Text(
-                            name,
+                            shownName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15.0, letterSpacing: -0.2),
@@ -801,7 +812,7 @@ class ScanRow extends StatelessWidget {
                             const SizedBox(width: 6.0),
                             Expanded(
                               child: Text(
-                                owner?.owner ?? 'Owner unknown',
+                                owner?.owner.capFirst() ?? 'Owner unknown',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.titleMedium?.copyWith(
@@ -908,7 +919,7 @@ class _EmptyRow extends StatelessWidget {
           Text("You haven't scanned anything yet", style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
           const SizedBox(height: 4.0),
           Text(
-            'Tap + to snap a product and see who really owns it.',
+            'Tap the scanner above to see who really owns a product.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),

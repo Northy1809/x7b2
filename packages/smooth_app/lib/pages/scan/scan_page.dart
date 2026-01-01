@@ -24,6 +24,7 @@ import 'package:smooth_app/pages/search/search_page.dart';
 import 'package:smooth_app/pages/search/search_product_helper.dart';
 import 'package:smooth_app/services/pending_scans.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/scan_sweep.dart';
 
 /// The camera, opened from the + on the home page, laid out as Cal AI's
 /// scanner: a × and a ? at the top, white corner brackets, the mode tiles,
@@ -228,6 +229,18 @@ class ScanOverlay extends StatelessWidget {
             children: <Widget>[
               Positioned.fill(
                 child: IgnorePointer(child: CustomPaint(painter: _FramePainter(rect: rect))),
+              ),
+              // 17/11: the scan line moves inside the corners while the
+              // camera looks, the same line that then reads the photo.
+              Positioned.fromRect(
+                rect: rect.deflate(16.0),
+                child: ScanSweep(
+                  pingPong: true,
+                  period: const Duration(milliseconds: 2200),
+                  color: Colors.white.withValues(alpha: 0.9),
+                  inset: 8.0,
+                  trail: 0.22,
+                ),
               ),
               Positioned(
                 top: padding.top + 10.0,

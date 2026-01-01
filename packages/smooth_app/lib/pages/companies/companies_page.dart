@@ -4,6 +4,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/database/dao_product_last_access.dart';
 import 'package:smooth_app/database/local_database.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/companies/avoid_list.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/pages/product/product_page/overview/score_ring.dart';
@@ -331,7 +332,7 @@ class _TopCards extends StatelessWidget {
                     const SizedBox(height: 6.0),
                     BigOver(value: i?.owners.length, size: 34.0),
                     const SizedBox(height: 4.0),
-                    Text('behind $total ${total == 1 ? 'product' : 'products'}', style: label),
+                    Text('Behind $total ${total == 1 ? 'product' : 'products'}', style: label),
                     const Spacer(),
                     const SizedBox(height: 10.0),
                     Text(
@@ -366,7 +367,7 @@ class _TopCards extends StatelessWidget {
                             ),
                     ),
                     const SizedBox(height: 8.0),
-                    Text('average of your companies', textAlign: TextAlign.center, style: label?.copyWith(fontSize: 12.0)),
+                    Text('Average of your companies', textAlign: TextAlign.center, style: label?.copyWith(fontSize: 12.0)),
                   ],
                 ),
               ),
@@ -424,7 +425,7 @@ class _CompanyRow extends StatelessWidget {
                         ],
                         Flexible(
                           child: Text(
-                            tally.owner,
+                            tally.owner.capFirst(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16.0, fontWeight: FontWeight.w600),

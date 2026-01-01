@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/search/search_hit_tile.dart';
 import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/services/ethics_db.dart';
@@ -342,7 +341,7 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
             hit: hit,
             ownerDb: _ownerDb,
             ethicsDb: _ethicsDb,
-            onTap: () => AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
+            onTap: () => openSearchHit(context, hit),
           );
         },
       ),

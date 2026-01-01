@@ -60,6 +60,10 @@ void main() {
   });
 
   testWidgets('home: no calendar or streak; the companies take their place', (WidgetTester tester) async {
+    // A tall phone: the scanner card (17/11) sits above the rows.
+    tester.view.physicalSize = const Size(1170, 4200);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
     final List<Product> scans = _scans();
     final HomeSummary summary = HomeSummary(
       products: scans,
@@ -92,7 +96,7 @@ void main() {
       ),
     );
     await settle(tester);
-    expect(find.text('behind 3 products'), findsOneWidget);
+    expect(find.text('Behind 3 products'), findsOneWidget);
     expect(find.text('Top 3 make 100 %'), findsOneWidget);
     expect(find.text('All time'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp(r'^Nestlé, 2 products, 67 percent')), findsOneWidget);

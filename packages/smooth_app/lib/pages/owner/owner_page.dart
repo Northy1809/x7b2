@@ -6,6 +6,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/helpers/haptics.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/product_page/overview/ethics_details.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
@@ -186,7 +187,7 @@ class _OwnerPageState extends State<OwnerPage> {
                               opacity: _titleVisible ? 1.0 : 0.0,
                               duration: CalMotion.page,
                               child: Text(
-                                widget.name,
+                                widget.name.capFirst(),
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -356,7 +357,7 @@ class _Hero extends StatelessWidget {
             Hero(tag: 'owner-logo-$name', child: OwnerAvatar(name: name, size: 88.0)),
             const SizedBox(height: 16.0),
             Text(
-              name,
+              name.capFirst(),
               textAlign: TextAlign.center,
               style: theme.textTheme.displayMedium?.copyWith(fontSize: 30.0, letterSpacing: -0.8, height: 1.1),
             ),

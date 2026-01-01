@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_app/helpers/haptics.dart';
-import 'package:smooth_app/pages/navigator/app_navigator.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/pages/product/product_page/overview/score_ring.dart';
 import 'package:smooth_app/pages/search/search_hit_tile.dart';
@@ -243,7 +243,7 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
         for (final OwnerRef owner in _owners(text))
           _SuggestionRow(
             leading: OwnerAvatar(name: owner.name, size: 36.0),
-            title: Text(owner.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+            title: Text(owner.name.capFirst(), style: const TextStyle(fontWeight: FontWeight.w600)),
             subtitle: owner.company == null
                 ? 'Company · see its brands'
                 : 'Company · moral score ${EthicsScore.compute(owner.company!).score}',
@@ -253,7 +253,7 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
         for (final String q in history)
           _SuggestionRow(
             leading: Icon(CupertinoIcons.clock, size: 19.0, color: muted),
-            title: Text(q),
+            title: Text(q.capFirst()),
             onTap: () => widget.onSearch(q),
           ),
         if (_brands.isNotEmpty || _categories.isNotEmpty)
@@ -281,7 +281,7 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
               dense: true,
               ownerDb: _ownerDb,
               ethicsDb: _ethicsDb,
-              onTap: () => AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
+              onTap: () => openSearchHit(context, hit),
             ),
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 6.0, kCalSide, 0.0),

@@ -43,6 +43,7 @@ import 'package:smooth_app/themes/color_provider.dart';
 import 'package:smooth_app/themes/contrast_provider.dart';
 import 'package:smooth_app/themes/smooth_theme.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 import 'package:smooth_app/widgets/smooth_view_padding.dart';
 
@@ -64,7 +65,8 @@ void main() {
   }
 }
 
-late final bool _screenshots;
+// False until launchSmoothApp sets it (tests pump SmoothApp directly).
+bool _screenshots = false;
 
 Future<void> launchSmoothApp({
   required Scanner barcodeScanner,
@@ -234,8 +236,15 @@ class _SmoothAppState extends State<SmoothApp> {
           return _buildError(snapshot);
         }
         if (snapshot.connectionState != ConnectionState.done) {
-          //We don't need a loading indicator since the splash screen is still visible
-          return EMPTY_WIDGET;
+          if (_screenshots) {
+            // The native launch screen stays for the store screenshots.
+            return EMPTY_WIDGET;
+          }
+          // 17/11: Flutter takes over the launch screen at once, with the
+          // same mark in the same place, and the mark comes alive while
+          // the app loads.
+          FlutterNativeSplash.remove();
+          return const Directionality(textDirection: TextDirection.ltr, child: OwnedSplash());
         }
 
         if (!_screenshots) {
@@ -243,7 +252,7 @@ class _SmoothAppState extends State<SmoothApp> {
           FlutterNativeSplash.remove();
         }
 
-        return MultiProvider(
+        final Widget app = MultiProvider(
           providers: <SingleChildWidget>[
             _provide<UserPreferences>(_userPreferences),
             _provide<ProductPreferences>(_productPreferences),
@@ -279,6 +288,7 @@ class _SmoothAppState extends State<SmoothApp> {
             ),
           ),
         );
+        return _screenshots ? app : OwnedSplashHandoff(child: app);
       },
     );
   }

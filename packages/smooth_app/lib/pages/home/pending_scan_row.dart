@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/scan/result/photo_result_page.dart';
 import 'package:smooth_app/services/brand_text_matcher.dart';
 import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/pending_scans.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/scan_sweep.dart';
 
 /// A photo being read, as Cal AI's meal row while it analyses: the photo
 /// darkened with a ring and the percentage on it, what is happening, and
@@ -53,24 +55,38 @@ class PendingScanRow extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                     child: ColoredBox(
                       color: const Color(0x73000000),
-                      child: Center(
-                        child: CalRing(
-                          fraction: scan.progress,
-                          size: 60.0,
-                          stroke: 5.0,
-                          color: Colors.white,
-                          child: Text(
-                            '${(scan.progress * 100).round()}%',
-                            textScaler: TextScaler.noScaling,
-                            style: const TextStyle(
-                              fontFamily: 'CupertinoSystemText',
-                              fontFamilyFallback: <String>['Inter'],
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          // 17/11: the photo is being read: the scan line
+                          // runs over it, under the ring.
+                          ScanSweep(
+                            active: !scan.done,
+                            period: const Duration(milliseconds: 1300),
+                            thickness: 2.0,
+                            glow: 8.0,
+                            trail: 0.45,
+                          ),
+                          Center(
+                            child: CalRing(
+                              fraction: scan.progress,
+                              size: 60.0,
+                              stroke: 5.0,
                               color: Colors.white,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
+                              child: Text(
+                                '${(scan.progress * 100).round()}%',
+                                textScaler: TextScaler.noScaling,
+                                style: const TextStyle(
+                                  fontFamily: 'CupertinoSystemText',
+                                  fontFamilyFallback: <String>['Inter'],
+                                  color: Colors.white,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
@@ -185,7 +201,8 @@ class _Answer extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final BrandCandidate? b = brand;
     final String title = b?.name ?? (scan.analysis?.barcode != null ? 'Barcode found' : "Couldn't read this one");
-    final String line = b?.owner.owner ?? (scan.analysis?.barcode != null ? 'Tap to see the owner' : 'Tap to try again');
+    final String line =
+        b?.owner.owner ?? (scan.analysis?.barcode != null ? 'Tap to see the owner' : 'Tap to try again');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +212,7 @@ class _Answer extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Text(
-                title,
+                title.capFirst(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15.0, letterSpacing: -0.2),
@@ -219,7 +236,7 @@ class _Answer extends StatelessWidget {
             const SizedBox(width: 6.0),
             Expanded(
               child: Text(
-                line,
+                line.capFirst(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: b == null
@@ -260,8 +277,7 @@ class _Answer extends StatelessWidget {
   /// ring fills, and a new future each time would blink the score to "–".
   static final Map<String, Future<int?>> _moralCache = <String, Future<int?>>{};
 
-  static Future<int?> _moralOnce(final BrandCandidate b) =>
-      _moralCache.putIfAbsent(b.owner.owner, () => _moral(b));
+  static Future<int?> _moralOnce(final BrandCandidate b) => _moralCache.putIfAbsent(b.owner.owner, () => _moral(b));
 
   static Future<int?> _moral(final BrandCandidate b) async {
     try {

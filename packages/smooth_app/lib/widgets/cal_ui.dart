@@ -1,8 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_app/helpers/haptics.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 
 /// Cal AI's page furniture (16/11 2026), so no screen falls back to the old
 /// Material / Open Food Facts look:
@@ -449,7 +453,7 @@ class CalPill extends StatelessWidget {
               ],
               Flexible(
                 child: Text(
-                  label,
+                  label.capFirst(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -469,8 +473,9 @@ class CalPill extends StatelessWidget {
 }
 
 /// Cal AI's waiting state: an ink arc turning on a light track (the same
-/// ring as the scores), instead of Material's spinner.
-class CalLoader extends StatefulWidget {
+/// ring as the scores), instead of Material's spinner. At 28 pt and up it
+/// is Owned's moving logo ([OwnedLoader]).
+class CalLoader extends StatelessWidget {
   const CalLoader({this.size = 28.0, this.stroke = 3.0, this.label, super.key});
 
   final double size;
@@ -480,10 +485,26 @@ class CalLoader extends StatefulWidget {
   final String? label;
 
   @override
-  State<CalLoader> createState() => _CalLoaderState();
+  Widget build(BuildContext context) =>
+      // Page-sized waits show the moving logo (17/11); small inline ones
+      // (a row, a button) keep the turning arc.
+      size >= 28.0
+      ? OwnedLoader(size: math.max(48.0, size * 1.6), label: label)
+      : _CalSpinner(size: size, stroke: stroke, label: label);
 }
 
-class _CalLoaderState extends State<CalLoader> with SingleTickerProviderStateMixin {
+class _CalSpinner extends StatefulWidget {
+  const _CalSpinner({required this.size, required this.stroke, this.label});
+
+  final double size;
+  final double stroke;
+  final String? label;
+
+  @override
+  State<_CalSpinner> createState() => _CalSpinnerState();
+}
+
+class _CalSpinnerState extends State<_CalSpinner> with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
     ..repeat();
 

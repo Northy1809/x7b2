@@ -57,20 +57,25 @@ abstract class SearchHelper extends ValueNotifier<SearchQuery?> {
     final String query,
   ) async => DaoStringList(localDatabase).remove(historyKey, query);
 
-  /// Typical search when we have a controller+focus.
+  /// Typical search when we have a controller+focus. The keyboard goes
+  /// down, so the results are not hidden behind it (17/11: a search started
+  /// by a tap, not the keyboard's Search key, left it up).
   void searchWithController(
     BuildContext context,
     String query,
     TextEditingController controller,
     FocusNode focusNode,
-  ) => search(
-    context,
-    query,
-    searchQueryCallback: (String query) {
-      controller.text = query;
-      focusNode.requestFocus();
-    },
-  );
+  ) {
+    focusNode.unfocus();
+    search(
+      context,
+      query,
+      searchQueryCallback: (String query) {
+        controller.text = query;
+        focusNode.requestFocus();
+      },
+    );
+  }
 }
 
 class SearchQuery {

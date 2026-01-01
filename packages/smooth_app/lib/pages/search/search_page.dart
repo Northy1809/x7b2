@@ -77,7 +77,6 @@ class _SearchPageState extends State<SearchPage> {
   // https://github.com/openfoodfacts/smooth-app/pull/2219
   final TextEditingController _searchTextController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -139,8 +138,7 @@ class _SearchPageState extends State<SearchPage> {
     final EdgeInsets pad = MediaQuery.paddingOf(context);
     return WillPopScope2(
       onWillPop: () async {
-        /// For the world view, we need to intercept the back button from here
-        /// See below for the custom [Navigator]
+        /// Back first leaves the results, then the page.
         if (widget.searchHelper.value != null) {
           setState(() => widget.searchHelper.value = null);
           return (false, null);
@@ -203,17 +201,11 @@ class _SearchPageState extends State<SearchPage> {
                         );
                       }
 
-                      /// A custom [Navigator] is used to intercept the World
-                      /// results to be embedded in this part of the screen and
-                      /// not on a new one.
-                      return Navigator(
-                        key: _navigatorKey,
-                        pages: <MaterialPage<dynamic>>[MaterialPage<void>(child: searchHelper.value!.widget)],
-                        onDidRemovePage: (_) {
-                          /// Mandatory to provide this method
-                          /// The event is intercepted by the [WillPopScope2]
-                        },
-                      );
+                      /// The results, straight in the page (17/11). They used to
+                      /// sit in a nested [Navigator] (Open Food Facts' "world
+                      /// results"), so a company tapped in them opened squeezed
+                      /// under the search field instead of as a page.
+                      return searchHelper.value!.widget;
                     },
                   ),
                 ),
@@ -230,14 +222,6 @@ class _SearchPageState extends State<SearchPage> {
       /// Update the search field when an history item is selected
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _searchTextController.text = value.search;
-      });
-    } else if (oldValue != null) {
-      /// If we were on the world results, ensure to go back to
-      /// the main list of results
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _navigatorKey.currentState?.popUntil((Route<dynamic> route) {
-          return route.isFirst;
-        });
       });
     }
   }

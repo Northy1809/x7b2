@@ -11,6 +11,7 @@ import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 
 /// Cal AI's "We're setting everything up for you" (16/11), for real: the
@@ -121,6 +122,9 @@ class _OwnedSetupPageState extends State<OwnedSetupPage> with SingleTickerProvid
           children: <Widget>[
             const OnboardingTopBar(OwnedSetupPage.page),
             const Spacer(flex: 2),
+            // 17/11: the moving logo on the waiting screen.
+            const Center(child: OwnedMark(size: 64.0, color: BrandColors.ink, motion: OwnedMarkMotion.loop)),
+            const SizedBox(height: 18.0),
             AnimatedBuilder(
               animation: _c,
               builder: (BuildContext context, _) => Semantics(

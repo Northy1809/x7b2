@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/helpers/haptics.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/product/common/search_helper.dart';
 import 'package:smooth_app/pages/product/common/search_preloaded_item.dart';
@@ -267,7 +268,7 @@ class _QueryRow extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      title,
+                      title.capFirst(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyLarge?.copyWith(
@@ -287,7 +288,7 @@ class _QueryRow extends StatelessWidget {
                         const SizedBox(width: 5.0),
                         Flexible(
                           child: Text(
-                            o == null ? 'Search again' : o.owner,
+                            o == null ? 'Search again' : o.owner.capFirst(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),

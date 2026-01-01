@@ -18,7 +18,10 @@ import 'package:smooth_app/services/product_search_service.dart';
 /// results page; a barcode opens Owned's product loader. Open Food Facts'
 /// classic search page, product-type switch and dialogs are gone.
 class SearchProductHelper extends SearchHelper {
-  SearchProductHelper();
+  SearchProductHelper({this.service});
+
+  /// For tests: the search engine client (the real one when null).
+  final ProductSearchService? service;
 
   @override
   String get historyKey => DaoStringList.keySearchProductHistory;
@@ -42,6 +45,7 @@ class SearchProductHelper extends SearchHelper {
     }
     return LiveSearchSuggestions(
       text: text,
+      service: service,
       history: getAllQueries(context.read<LocalDatabase>()),
       onSearch: (String query) {
         controller.text = query;
@@ -57,6 +61,7 @@ class SearchProductHelper extends SearchHelper {
               key: ValueKey<String>('category:${category.tag}'),
               query: category.name,
               category: category,
+              service: service,
             ),
           ),
         );
@@ -89,7 +94,7 @@ class SearchProductHelper extends SearchHelper {
     emit(
       SearchQuery(
         search: query,
-        widget: ProductSearchResultsView(key: ValueKey<String>('text:$query'), query: query),
+        widget: ProductSearchResultsView(key: ValueKey<String>('text:$query'), query: query, service: service),
       ),
     );
   }
