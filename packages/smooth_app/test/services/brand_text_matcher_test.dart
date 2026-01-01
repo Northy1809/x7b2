@@ -90,6 +90,7 @@ void main() {
       localDb: () async => _db(),
       packWords: () async => const <String>{},
       online: (_) async => online,
+      enhancedRead: (_, _) async => null,
     );
 
     test('a barcode in the photo is read, and the brand too (for an unknown barcode)', () async {

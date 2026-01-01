@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:smooth_app/helpers/gs1_code.dart';
+import 'package:smooth_app/services/barcode_rescue.dart';
 import 'package:smooth_app/services/brand_text_matcher.dart';
 import 'package:smooth_app/services/label_ocr.dart';
 import 'package:smooth_app/services/label_operator_parser.dart';
@@ -37,7 +38,9 @@ class PhotoAnalyzer {
     Future<OwnershipLocalDb> Function()? localDb,
     Future<Set<String>> Function()? packWords,
     Future<BrandOwnerResult?> Function(String brand)? online,
+    Future<String?> Function(String path, Future<String?> Function(String path) read)? enhancedRead,
   }) : _readBarcode = readBarcode ?? _mlKitBarcode,
+       _enhancedRead = enhancedRead ?? BarcodeRescue.enhancedPasses,
        _localDb = localDb ?? OwnershipLocalDb.load,
        _packWords = packWords ?? BrandTextMatcher.loadPackWords,
        _online = online ?? OwnershipService().lookupWikidata;
@@ -47,6 +50,7 @@ class PhotoAnalyzer {
   final Future<OwnershipLocalDb> Function() _localDb;
   final Future<Set<String>> Function() _packWords;
   final Future<BrandOwnerResult?> Function(String brand) _online;
+  final Future<String?> Function(String path, Future<String?> Function(String path) read) _enhancedRead;
 
   /// Steps for the "analyzing" screen.
   static const List<String> steps = <String>[
@@ -64,9 +68,13 @@ class PhotoAnalyzer {
     onStep?.call(0);
     // The pack is read even when a barcode is found: a barcode no database
     // knows still gets an answer from the brand on the photo (11/11 2026).
-    final String? barcode = await _safe(() => _readBarcode(path));
+    String? barcode = await _safe(() => _readBarcode(path));
     onStep?.call(1);
     final LabelText text = await _safe(() => ocr.readLines(path)) ?? LabelText.empty;
+    final List<String> lines = <String>[for (final PackTextLine l in text.lines) l.text];
+    // 20/11: the bars were not readable (blur, glare, a curved pack); the
+    // digits printed under them often are.
+    barcode ??= BarcodeRescue.fromText(lines);
     onStep?.call(2);
     final OwnershipLocalDb? db = await _safe(_localDb);
     final List<BrandCandidate> found = <BrandCandidate>[];
@@ -91,6 +99,12 @@ class PhotoAnalyzer {
       }
     }
     onStep?.call(3);
+    if (barcode == null && (found.isEmpty || BarcodeRescue.mentionsACode(lines))) {
+      // Nothing else to go on, or digits as long as a barcode's: read the
+      // bars again on clearer versions of the photo. Skipped for a plain
+      // front-of-pack photo with a known brand, so that stays fast.
+      barcode = await _safe(() => _enhancedRead(path, _readBarcode));
+    }
     if (found.isEmpty && barcode != null && db != null) {
       // The company that registered the barcode's GS1 prefix.
       final LocalOwnerResult? byCode = db.lookup(barcode: barcode);
