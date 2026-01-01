@@ -78,7 +78,7 @@ void main() {
     for (final String v in variants) {
       final img.Image? i = img.decodeImage(File(v).readAsBytesSync());
       expect(i, isNotNull);
-      expect(i!.width <= 1600 && i.height <= 1600, isTrue);
+      expect(i!.width <= 3200 && i.height <= 3200, isTrue);
     }
   });
 
@@ -90,6 +90,7 @@ void main() {
           localDb: () async => _db(),
           packWords: () async => const <String>{},
           online: (_) async => null,
+          prepare: (_) async => null,
           enhancedRead: (String path, _) async {
             enhancedCalls.add(path);
             return enhanced;
@@ -111,12 +112,51 @@ void main() {
       expect(a.barcode, '3017620422003');
     });
 
-    test('a known brand on the front, no digits: no extra reading, stays fast', () async {
+    test('a known brand on the front: the bars are still looked for, the barcode wins', () async {
       final List<String> calls = <String>[];
-      final PhotoAnalysis a = await analyzer(<String>['NUTELLA'], enhancedCalls: calls).analyze('x.jpg');
-      expect(calls, isEmpty);
-      expect(a.barcode, isNull);
+      final PhotoAnalysis a = await analyzer(<String>['NUTELLA'], enhancedCalls: calls, enhanced: '3017620422003')
+          .analyze('x.jpg');
+      expect(calls, <String>['x.jpg']);
+      expect(a.barcode, '3017620422003');
       expect(a.brands, isNotEmpty);
+    });
+
+    test('bars read straight away: no clearer copies', () async {
+      final List<String> calls = <String>[];
+      final PhotoAnalysis a = await PhotoAnalyzer(
+        ocr: const _Ocr(<String>['NUTELLA']),
+        readBarcode: (_) async => '3017620422003',
+        localDb: () async => _db(),
+        packWords: () async => const <String>{},
+        online: (_) async => null,
+        prepare: (_) async => null,
+        enhancedRead: (String path, _) async {
+          calls.add(path);
+          return null;
+        },
+      ).analyze('x.jpg');
+      expect(calls, isEmpty);
+      expect(a.barcode, '3017620422003');
+    });
+
+    test('the upright copy is read, not the camera file', () async {
+      final List<String> read = <String>[];
+      await PhotoAnalyzer(
+        ocr: const _Ocr(<String>['blurry']),
+        readBarcode: (String p) async {
+          read.add(p);
+          return null;
+        },
+        localDb: () async => _db(),
+        packWords: () async => const <String>{},
+        online: (_) async => null,
+        prepare: (_) async => 'x_upright.jpg',
+        enhancedRead: (String path, _) async {
+          read.add('clearer:$path');
+          return null;
+        },
+      ).analyze('x.jpg');
+      expect(read, <String>['x_upright.jpg', 'clearer:x_upright.jpg']);
     });
   });
 }

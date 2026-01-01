@@ -20,6 +20,7 @@ import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/product_page/new_product_header.dart';
 import 'package:smooth_app/pages/scan/photo_camera_view.dart';
 import 'package:smooth_app/pages/scan/result/photo_result_page.dart';
+import 'package:smooth_app/pages/scan/scan_self_test_page.dart';
 import 'package:smooth_app/pages/search/search_page.dart';
 import 'package:smooth_app/pages/search/search_product_helper.dart';
 import 'package:smooth_app/services/pending_scans.dart';
@@ -258,9 +259,15 @@ class ScanOverlay extends StatelessWidget {
                     else
                       const SizedBox.square(dimension: 40.0),
                     // The wordmark in the middle, white, as Cal AI's camera.
-                    const Expanded(
+                    // Held down: the scanner's self-test (23/11).
+                    Expanded(
                       child: Center(
-                        child: IgnorePointer(child: OwnedWordmark(height: 22.0, color: Colors.white)),
+                        child: GestureDetector(
+                          onLongPress: () => Navigator.of(context).push<void>(
+                            MaterialPageRoute<void>(builder: (_) => const ScanSelfTestPage()),
+                          ),
+                          child: const OwnedWordmark(height: 22.0, color: Colors.white),
+                        ),
                       ),
                     ),
                     _RoundButton(

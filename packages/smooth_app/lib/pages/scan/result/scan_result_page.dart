@@ -261,6 +261,8 @@ class _BrandOnPhotoState extends State<_BrandOnPhoto> {
           await PhotoAnalyzer(
             readBarcode: (_) async => null,
             online: (_) async => null,
+            // The barcode is known here; only the brand is wanted.
+            enhancedRead: (_, _) async => null,
           ).analyze(
             file.path,
             countryTags: <String>[ProductQuery.getCountry().offTag],

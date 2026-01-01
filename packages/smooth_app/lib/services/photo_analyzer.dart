@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:smooth_app/helpers/gs1_code.dart';
@@ -39,13 +43,16 @@ class PhotoAnalyzer {
     Future<Set<String>> Function()? packWords,
     Future<BrandOwnerResult?> Function(String brand)? online,
     Future<String?> Function(String path, Future<String?> Function(String path) read)? enhancedRead,
-  }) : _readBarcode = readBarcode ?? _mlKitBarcode,
+    Future<String?> Function(String path)? prepare,
+  }) : _prepare = prepare ?? uprightCopy,
+       _readBarcode = readBarcode ?? _mlKitBarcode,
        _enhancedRead = enhancedRead ?? BarcodeRescue.enhancedPasses,
        _localDb = localDb ?? OwnershipLocalDb.load,
        _packWords = packWords ?? BrandTextMatcher.loadPackWords,
        _online = online ?? OwnershipService().lookupWikidata;
 
   final LabelOcr ocr;
+  final Future<String?> Function(String path) _prepare;
   final Future<String?> Function(String path) _readBarcode;
   final Future<OwnershipLocalDb> Function() _localDb;
   final Future<Set<String>> Function() _packWords;
@@ -66,15 +73,28 @@ class PhotoAnalyzer {
     final void Function(int step)? onStep,
   }) async {
     onStep?.call(0);
+    final Stopwatch watch = Stopwatch()..start();
+    // 23/11: the camera's full-size photo, turned upright (the camera only
+    // notes "turned" in the file, and the barcode reader ignores that) and
+    // made a sensible size, read by everything below.
+    final String work = await _safe(() => _prepare(path)) ?? path;
     // The pack is read even when a barcode is found: a barcode no database
     // knows still gets an answer from the brand on the photo (11/11 2026).
-    String? barcode = await _safe(() => _readBarcode(path));
+    String? barcode = await _safe(() => _readBarcode(work));
+    String how = barcode == null ? '' : 'bars';
     onStep?.call(1);
-    final LabelText text = await _safe(() => ocr.readLines(path)) ?? LabelText.empty;
+    final LabelText text = await _safe(() => ocr.readLines(work)) ?? LabelText.empty;
     final List<String> lines = <String>[for (final PackTextLine l in text.lines) l.text];
     // 20/11: the bars were not readable (blur, glare, a curved pack); the
     // digits printed under them often are.
-    barcode ??= BarcodeRescue.fromText(lines);
+    if (barcode == null) {
+      barcode = BarcodeRescue.fromText(lines);
+      how = barcode == null ? '' : 'digits';
+    }
+    // 23/11: still none: the bars again on clearer versions of the photo,
+    // while the brands are matched. Always, also with a brand on the front:
+    // a guessed brand is worse than the product the barcode names.
+    final Future<String?>? rescue = barcode == null ? _safe(() => _enhancedRead(work, _readBarcode)) : null;
     onStep?.call(2);
     final OwnershipLocalDb? db = await _safe(_localDb);
     final List<BrandCandidate> found = <BrandCandidate>[];
@@ -99,12 +119,15 @@ class PhotoAnalyzer {
       }
     }
     onStep?.call(3);
-    if (barcode == null && (found.isEmpty || BarcodeRescue.mentionsACode(lines))) {
-      // Nothing else to go on, or digits as long as a barcode's: read the
-      // bars again on clearer versions of the photo. Skipped for a plain
-      // front-of-pack photo with a known brand, so that stays fast.
-      barcode = await _safe(() => _enhancedRead(path, _readBarcode));
+    if (rescue != null) {
+      barcode = await rescue;
+      how = barcode == null ? 'none' : 'clearer';
     }
+    if (!identical(work, path)) {
+      unawaited(_safe(() => File(work).delete()));
+    }
+    lastRun = 'barcode=${barcode ?? '-'} via=$how brands=${found.length} lines=${lines.length} ms=${watch.elapsedMilliseconds}';
+    debugPrint('OWNED_SCAN $lastRun');
     if (found.isEmpty && barcode != null && db != null) {
       // The company that registered the barcode's GS1 prefix.
       final LocalOwnerResult? byCode = db.lookup(barcode: barcode);
@@ -121,6 +144,23 @@ class PhotoAnalyzer {
       found.addAll(await _onlineGuess(text.lines));
     }
     return PhotoAnalysis(barcode: barcode, brands: _distinctOwners(found));
+  }
+
+  /// What the last [analyze] found and how, for the log and the self-test.
+  String lastRun = '';
+
+  /// [path] turned upright and at most about 2400 x 3200, written next to
+  /// it; null when it could not be made (the original is read then).
+  static Future<String?> uprightCopy(final String path) async {
+    final String target = path.replaceFirst(RegExp(r'(\.[^./\\]+)?$'), '_upright.jpg');
+    final XFile? out = await FlutterImageCompress.compressAndGetFile(
+      path,
+      target,
+      minWidth: 2400,
+      minHeight: 2400,
+      quality: 92,
+    ).timeout(const Duration(seconds: 6));
+    return out?.path;
   }
 
   /// The biggest words on the pack, looked up on Wikidata.

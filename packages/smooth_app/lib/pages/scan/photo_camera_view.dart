@@ -87,7 +87,10 @@ class _PhotoCameraViewState extends State<PhotoCameraView> {
       );
       final CameraController controller = CameraController(
         back,
-        ResolutionPreset.high,
+        // 23/11: the full sensor. "high" gave 1280 x 720 photos, too few
+        // pixels for the bars of a barcode a hand's width away, and closer
+        // than that the lens cannot focus.
+        ResolutionPreset.max,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
       );
