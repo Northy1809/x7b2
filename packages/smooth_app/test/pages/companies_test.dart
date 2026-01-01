@@ -100,7 +100,7 @@ void main() {
     expect(find.text('Top 3 make 100 %'), findsOneWidget);
     expect(find.text('All time'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp(r'^Nestlé, 2 products, 67 percent')), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp(r'^Ferrero SpA, 1 products, 33 percent')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp(r'^Ferrero SpA, 1 product, 33 percent')), findsOneWidget);
     expect(find.text('Companies you avoid'), findsOneWidget);
   });
 

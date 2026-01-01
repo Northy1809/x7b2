@@ -76,8 +76,16 @@ class AppNavigator extends InheritedWidget {
   // Router to use with a [WidgetsApp]
   RouterConfig<Object> get router => _router.router;
 
+  /// For tests: records each push instead of opening the screen.
+  @visibleForTesting
+  static void Function(String routeName, Object? extra)? debugPush;
+
   Future<T?> push<T extends Object?>(String routeName, {dynamic extra}) async {
     assert(routeName.isNotEmpty);
+    if (debugPush != null) {
+      debugPush!(routeName, extra);
+      return null;
+    }
     return _router.router.push(routeName, extra: extra);
   }
 

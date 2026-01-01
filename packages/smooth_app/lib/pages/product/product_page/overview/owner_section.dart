@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/pages/owner/owner_correction_page.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/overview_card.dart';
@@ -321,7 +322,7 @@ class AlsoOwns extends StatelessWidget {
                             builder: (_) => SearchPage(
                               SearchProductHelper(),
                               autofocus: false,
-                              initialQuery: b,
+                              initialQuery: b.capFirst(),
                             ),
                           ),
                         ),
@@ -340,7 +341,7 @@ class AlsoOwns extends StatelessWidget {
                               ),
                               const SizedBox(width: 6.0),
                               Text(
-                                b,
+                                b.capFirst(),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.w600,

@@ -395,7 +395,7 @@ class _CompanyRow extends StatelessWidget {
     final bool avoided = AvoidedOwners.instance.isAvoided(<String?>[tally.owner, tally.company?.name]);
     return Semantics(
       button: true,
-      label: '${tally.owner}, ${tally.count} products, $share percent'
+      label: '${tally.owner.capFirst()}, ${tally.count} ${tally.count == 1 ? 'product' : 'products'}, $share percent'
           '${tally.ethicsScore == null ? '' : ', moral score ${tally.ethicsScore}'}'
           '${avoided ? ', avoided' : ''}',
       excludeSemantics: true,

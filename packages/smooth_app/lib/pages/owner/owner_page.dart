@@ -531,7 +531,7 @@ class _ScannedGroup extends StatelessWidget {
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(4.0, 10.0, 4.0, 0.0),
             child: Text(
-              'and ${products.length - shown.length} more in your history',
+              'And ${products.length - shown.length} more in your history',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -564,7 +564,7 @@ class _Brands extends StatelessWidget {
                 label: b,
                 onTap: () => Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
-                    builder: (_) => SearchPage(SearchProductHelper(), autofocus: false, initialQuery: b),
+                    builder: (_) => SearchPage(SearchProductHelper(), autofocus: false, initialQuery: b.capFirst()),
                   ),
                 ),
               ),

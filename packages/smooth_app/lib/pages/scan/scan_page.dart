@@ -24,6 +24,7 @@ import 'package:smooth_app/pages/search/search_page.dart';
 import 'package:smooth_app/pages/search/search_product_helper.dart';
 import 'package:smooth_app/services/pending_scans.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/owned_mark.dart';
 import 'package:smooth_app/widgets/scan_sweep.dart';
 
 /// The camera, opened from the + on the home page, laid out as Cal AI's
@@ -148,7 +149,11 @@ class _ScanPageState extends State<ScanPage> {
   @override
   Widget build(BuildContext context) {
     if (context.watch<ContinuousScanModel?>() == null) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      // The camera is starting: the moving logo, white on the camera's black.
+      return const ColoredBox(
+        color: Colors.black,
+        child: Center(child: OwnedLoader(size: 64.0, color: Colors.white)),
+      );
     }
     final bool hasACamera = CameraHelper.hasACamera;
     return AnnotatedRegion<SystemUiOverlayStyle>(

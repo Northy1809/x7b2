@@ -570,7 +570,7 @@ class _TypeBrandDialogState extends State<_TypeBrandDialog> {
         controller: _text,
         autofocus: true,
         textCapitalization: TextCapitalization.words,
-        decoration: const InputDecoration(hintText: 'e.g. Lurpak'),
+        decoration: const InputDecoration(hintText: 'For example Lurpak'),
         onSubmitted: (String v) => Navigator.of(context).pop(v),
       ),
       actions: <Widget>[

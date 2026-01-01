@@ -42,20 +42,40 @@ abstract class SearchHelper extends ValueNotifier<SearchQuery?> {
   }) => null;
 
   /// Returns all the previous queries, in reverse order.
-  List<String> getAllQueries(final LocalDatabase localDatabase) =>
-      DaoStringList(localDatabase).getAll(historyKey).reversed.toList();
+  ///
+  /// 18/11: a history that cannot be read (a damaged store) shows as empty;
+  /// it must never stop the search itself.
+  List<String> getAllQueries(final LocalDatabase localDatabase) {
+    try {
+      return DaoStringList(localDatabase).getAll(historyKey).reversed.toList();
+    } catch (_) {
+      return const <String>[];
+    }
+  }
 
-  /// Adds a query to the history.
+  /// Adds a query to the history; the search runs even if this fails.
   Future<void> addQuery(
     final LocalDatabase localDatabase,
     final String query,
-  ) async => DaoStringList(localDatabase).add(historyKey, query);
+  ) async {
+    try {
+      await DaoStringList(localDatabase).add(historyKey, query);
+    } catch (_) {
+      // Not remembered, still searched.
+    }
+  }
 
   /// Removes a query from the history.
   Future<bool> removeQuery(
     final LocalDatabase localDatabase,
     final String query,
-  ) async => DaoStringList(localDatabase).remove(historyKey, query);
+  ) async {
+    try {
+      return await DaoStringList(localDatabase).remove(historyKey, query);
+    } catch (_) {
+      return false;
+    }
+  }
 
   /// Typical search when we have a controller+focus. The keyboard goes
   /// down, so the results are not hidden behind it (17/11: a search started

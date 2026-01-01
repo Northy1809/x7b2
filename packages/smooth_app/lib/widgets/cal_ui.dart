@@ -762,14 +762,14 @@ class CalNavRow extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(
-                        title,
+                        title.capFirst(),
                         style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16.0, letterSpacing: -0.3),
                       ),
                       if (subtitle != null)
                         Padding(
                           padding: const EdgeInsetsDirectional.only(top: 2.0),
                           child: Text(
-                            subtitle!,
+                            subtitle!.capFirst(),
                             style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, height: 1.3, color: muted),
                           ),
                         ),

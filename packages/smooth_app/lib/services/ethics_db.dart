@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/score_types.dart';
 
@@ -287,5 +288,5 @@ class EthicsDb {
   /// The name to show for an owner: the researched company's name, except
   /// for a two-company owner, which keeps both names.
   static String displayName(final String owner, final EthicsCompany? company) =>
-      company == null || splitOwner(owner).length > 1 ? owner : company.name;
+      (company == null || splitOwner(owner).length > 1 ? owner : company.name).capFirst();
 }
