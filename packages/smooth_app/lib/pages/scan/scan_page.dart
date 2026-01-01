@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/data_models/continuous_scan_model.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
-import 'package:smooth_app/generic_lib/dialogs/smooth_alert_dialog.dart';
 import 'package:smooth_app/generic_lib/widgets/owned_wordmark.dart';
 import 'package:smooth_app/generic_lib/widgets/smooth_back_button.dart';
 import 'package:smooth_app/helpers/camera_helper.dart';
@@ -646,30 +646,24 @@ class _PermissionDeniedCard extends StatelessWidget {
       listen: false,
     ).askPermission(
       onRationaleNotAvailable: () async {
-        return showDialog(
+        return showCupertinoDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             final AppLocalizations localizations = AppLocalizations.of(context);
-            return SmoothAlertDialog(
-              title:
-                  localizations.permission_photo_denied_dialog_settings_title,
-              body: Text(
-                localizations.permission_photo_denied_dialog_settings_message,
-                style: const TextStyle(height: 1.6),
-              ),
-              negativeAction: SmoothActionButton(
-                text: localizations
-                    .permission_photo_denied_dialog_settings_button_cancel,
-                onPressed: () => Navigator.of(context).pop(false),
-                lines: 2,
-              ),
-              positiveAction: SmoothActionButton(
-                text: localizations
-                    .permission_photo_denied_dialog_settings_button_open,
-                onPressed: () => Navigator.of(context).pop(true),
-                lines: 2,
-              ),
-              actionsAxis: Axis.vertical,
+            return CupertinoAlertDialog(
+              title: Text(localizations.permission_photo_denied_dialog_settings_title),
+              content: Text(localizations.permission_photo_denied_dialog_settings_message),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(localizations.permission_photo_denied_dialog_settings_button_cancel),
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(localizations.permission_photo_denied_dialog_settings_button_open),
+                ),
+              ],
             );
           },
         );

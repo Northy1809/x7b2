@@ -3,6 +3,7 @@ import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/launch_url_helper.dart';
 import 'package:smooth_app/pages/product/product_page/widgets/product_page_title.dart';
 import 'package:smooth_app/services/ownership_service.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Shared rendering for an ownership chain + its source, used by both the
 /// resolved "Owner" tab and the unknown-barcode fallback card so the two
@@ -240,7 +241,7 @@ class OwnershipLoadingView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const CircularProgressIndicator(),
+            const CalLoader(),
             const SizedBox(height: MEDIUM_SPACE),
             Flexible(child: Text(label, style: Theme.of(context).textTheme.bodySmall)),
           ],

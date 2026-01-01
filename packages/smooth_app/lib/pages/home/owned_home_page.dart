@@ -22,6 +22,7 @@ import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/pending_scans.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// Everything the home page shows, worked out from the scan history.
@@ -38,6 +39,26 @@ class HomeSummary {
 
   /// Barcode -> when it was last opened.
   final Map<String, DateTime> lastSeen;
+
+  /// The scan history with owners, scores and times (home and History page).
+  static Future<HomeSummary> load(final LocalDatabase db) async {
+    final List<Product> products = await OwnerInsights.historyProducts(db);
+    final OwnershipLocalDb local = await OwnershipLocalDb.load();
+    EthicsDb? ethics;
+    try {
+      ethics = await EthicsDb.load();
+    } catch (_) {
+      // Owners still show without scores.
+    }
+    final Map<String, int> seen = await DaoProductLastAccess(db).getAll();
+    return HomeSummary(
+      products: products,
+      insights: OwnerInsights.compute(products, local, ethics: ethics),
+      lastSeen: <String, DateTime>{
+        for (final MapEntry<String, int> e in seen.entries) e.key: DateTime.fromMillisecondsSinceEpoch(e.value),
+      },
+    );
+  }
 
   int get total => insights.total;
   int get known => total - insights.unknown.length;
@@ -151,23 +172,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
     if (widget.load != null) {
       return widget.load!();
     }
-    final LocalDatabase db = _localDatabase;
-    final List<Product> products = await OwnerInsights.historyProducts(db);
-    final OwnershipLocalDb local = await OwnershipLocalDb.load();
-    EthicsDb? ethics;
-    try {
-      ethics = await EthicsDb.load();
-    } catch (_) {
-      // Owners still show without scores.
-    }
-    final Map<String, int> seen = await DaoProductLastAccess(db).getAll();
-    return HomeSummary(
-      products: products,
-      insights: OwnerInsights.compute(products, local, ethics: ethics),
-      lastSeen: <String, DateTime>{
-        for (final MapEntry<String, int> e in seen.entries) e.key: DateTime.fromMillisecondsSinceEpoch(e.value),
-      },
-    );
+    return HomeSummary.load(_localDatabase);
   }
 
   @override
@@ -230,30 +235,13 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
                 FadeUpIn(
                   index: 3,
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(_Spec.side, 0.0, _Spec.side - 8.0, 0.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            'Recently scanned',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.45,
-                            ),
-                          ),
-                        ),
-                        if (s != null && s.products.isNotEmpty)
-                          TextButton(
-                            onPressed: () {
-                              Haptics.tap();
-                              Navigator.of(context).push<void>(
-                                MaterialPageRoute<void>(builder: (_) => const HistoryPage()),
-                              );
-                            },
-                            child: const Text('See all'),
-                          ),
-                      ],
+                    padding: const EdgeInsetsDirectional.symmetric(horizontal: _Spec.side),
+                    child: CalSectionTitle(
+                      'Recently scanned',
+                      action: s != null && s.products.isNotEmpty ? 'See all' : null,
+                      onAction: () => Navigator.of(context).push<void>(
+                        MaterialPageRoute<void>(builder: (_) => const HistoryPage()),
+                      ),
                     ),
                   ),
                 ),
@@ -279,7 +267,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
                       padding: rowPad,
                       child: FadeUpIn(
                         index: 4 + i,
-                        child: _ScanRow(
+                        child: ScanRow(
                           product: s.products[i],
                           owner: s.ownerOf(s.products[i]),
                           seen: s.lastSeen[s.products[i].barcode],
@@ -706,8 +694,8 @@ class _SmallCard extends StatelessWidget {
 /// One scan as Cal AI's "Recently uploaded" row: photo on the left, the
 /// product with the time in grey, the owner as the big line, and the two
 /// scores under it.
-class _ScanRow extends StatelessWidget {
-  const _ScanRow({required this.product, required this.owner, required this.seen});
+class ScanRow extends StatelessWidget {
+  const ScanRow({required this.product, required this.owner, required this.seen});
 
   final Product product;
   final OwnerTally? owner;
@@ -817,9 +805,9 @@ class _ScanRow extends StatelessWidget {
                         const SizedBox(height: 6.0),
                         Row(
                           children: <Widget>[
-                            _Chip(icon: Icons.balance_rounded, value: moral),
+                            ScoreChip(icon: Icons.balance_rounded, value: moral),
                             const SizedBox(width: 14.0),
-                            if (health != null) _Chip(icon: CupertinoIcons.heart_fill, value: health),
+                            if (health != null) ScoreChip(icon: CupertinoIcons.heart_fill, value: health),
                           ],
                         ),
                       ],
@@ -835,8 +823,8 @@ class _ScanRow extends StatelessWidget {
   }
 }
 
-class _Chip extends StatelessWidget {
-  const _Chip({required this.icon, required this.value});
+class ScoreChip extends StatelessWidget {
+  const ScoreChip({required this.icon, required this.value});
 
   final IconData icon;
   final int? value;

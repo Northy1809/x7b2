@@ -8,6 +8,7 @@ import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/owner_directory.dart';
 import 'package:smooth_app/services/owner_overrides.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// "Not right?": the user names the real owner. The correction stays on the
 /// phone and wins over the database on every screen. Pops with true when
@@ -123,7 +124,7 @@ class _OwnerCorrectionPageState extends State<OwnerCorrectionPage> {
       height: 1.4,
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Correct the owner')),
+      appBar: const CalTopBar(title: 'Correct the owner'),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsetsDirectional.all(LARGE_SPACE),

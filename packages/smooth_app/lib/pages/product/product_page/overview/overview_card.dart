@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/services/score_types.dart';
+import 'package:smooth_app/widgets/cal_kit.dart';
 
-/// Plain rounded card used by every section of the product overview, so
-/// the page reads as one calm list instead of many different widgets.
+/// The card behind every section of the product page, details pages and
+/// info pages: Cal AI's white card (20 pt corners, faint border, soft
+/// shadow) on the 24 pt page margin (16/11; was a Material card).
 class OverviewCard extends StatelessWidget {
   const OverviewCard({required this.child, this.padding, super.key});
 
@@ -11,29 +13,19 @@ class OverviewCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LARGE_SPACE,
-        vertical: SMALL_SPACE,
-      ),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsetsDirectional.symmetric(horizontal: 24.0, vertical: 7.0),
+    child: CalCard(
+      padding: EdgeInsetsDirectional.zero,
+      // Fold-outs and rows inside paint their press on a Material.
       child: Material(
-        color: theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: ROUNDED_BORDER_RADIUS,
-          side: BorderSide(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.10),
-          ),
-        ),
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(20.0),
         clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: padding ?? const EdgeInsetsDirectional.all(LARGE_SPACE),
-          child: child,
-        ),
+        child: Padding(padding: padding ?? const EdgeInsetsDirectional.all(18.0), child: child),
       ),
-    );
-  }
+    ),
+  );
 }
 
 /// Section heading: title, optional subtitle and a trailing widget.
@@ -57,7 +49,9 @@ class OverviewHeading extends StatelessWidget {
               Text(
                 title,
                 style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.45,
                 ),
               ),
               if (subtitle != null)
@@ -99,13 +93,14 @@ class FoldOut extends StatelessWidget {
           minTileHeight: 48.0,
           childrenPadding: const EdgeInsetsDirectional.only(bottom: SMALL_SPACE),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          iconColor: theme.colorScheme.primary,
-          collapsedIconColor: theme.colorScheme.primary,
+          iconColor: theme.colorScheme.onSurfaceVariant,
+          collapsedIconColor: theme.colorScheme.onSurfaceVariant,
           title: Text(
             title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.primary,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontSize: 15.0,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
             ),
           ),
           children: children,

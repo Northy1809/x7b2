@@ -12,6 +12,7 @@ import 'package:smooth_app/services/nutriscore_estimate.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/product_search_service.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Picks better products in the same category: a better Nutri-Score first,
 /// then a better ethics score for the owner, then popularity.
@@ -245,7 +246,7 @@ class _AlternativesSectionState extends State<AlternativesSection> {
           if (hits == null)
             const Padding(
               padding: EdgeInsetsDirectional.all(LARGE_SPACE),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: CalLoader()),
             )
           else
             for (final SearchHit hit in hits)

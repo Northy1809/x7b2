@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,10 +11,9 @@ import 'package:smooth_app/data_models/continuous_scan_model.dart';
 import 'package:smooth_app/database/dao_product.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
-import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
-import 'package:smooth_app/pages/product/product_page/new_product_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/overview_card.dart';
+import 'package:smooth_app/pages/product/product_page/overview/product_facts_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/product_overview.dart';
 import 'package:smooth_app/pages/product/product_page/tabs/ownership/barcode_owner_hint.dart';
 import 'package:smooth_app/pages/product/product_page/tabs/ownership/unknown_barcode_ownership_card.dart';
@@ -22,6 +22,7 @@ import 'package:smooth_app/pages/scan/result/scan_sheet_scaffold.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/services/brand_text_matcher.dart';
 import 'package:smooth_app/services/photo_analyzer.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// What a barcode scan opens: the frame it was read from, with the answer
 /// popping up over it as a sheet. While the product loads the sheet says so;
@@ -110,15 +111,7 @@ class _LoadedState extends State<_Loaded> {
             product: product,
             photo: widget.photo,
             leading: const _CloseIcon(),
-            onShowDetails: () => Navigator.of(context).push<void>(
-              MaterialPageRoute<void>(
-                builder: (BuildContext context) => ProductPage(
-                  product,
-                  withHeroAnimation: false,
-                  detailed: true,
-                ),
-              ),
-            ),
+            onShowDetails: () => ProductFactsPage.open(context, product),
           ),
         );
       },
@@ -130,10 +123,10 @@ class _CloseIcon extends StatelessWidget {
   const _CloseIcon();
 
   @override
-  Widget build(BuildContext context) => IconButton(
+  Widget build(BuildContext context) => CalRoundButton(
+    icon: CupertinoIcons.xmark,
     tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-    icon: const Icon(Icons.close_rounded),
-    onPressed: () => Navigator.of(context).maybePop(),
+    onTap: () => Navigator.of(context).maybePop(),
   );
 }
 
@@ -220,23 +213,8 @@ class _Unknown extends StatelessWidget {
         ),
         if (!offline)
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsetsDirectional.symmetric(
-                horizontal: SMALL_SPACE,
-              ),
-              child: UnknownBarcodeOwnershipCard(barcode: barcode),
-            ),
+            child: UnknownBarcodeOwnershipCard(barcode: barcode),
           ),
-        SliverToBoxAdapter(
-          child: Center(
-            child: TextButton(
-              onPressed: () => AppNavigator.of(
-                context,
-              ).push(AppRoutes.PRODUCT_CREATOR(barcode)),
-              child: const Text('Add it to Open Food Facts'),
-            ),
-          ),
-        ),
         SliverToBoxAdapter(
           child: Center(
             child: Text(

@@ -1,13 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
-import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/pages/product/product_page/overview/product_overview.dart';
 import 'package:smooth_app/query/product_query.dart';
 import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/product_search_service.dart';
-import 'package:smooth_app/services/score_types.dart';
+import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// `en:denmark`-style tag for the user's country, as used in OFF's
 /// `countries_tags` and in the offline ownership database. Null before the
@@ -53,62 +55,28 @@ List<String> userSearchLangs() {
   return <String>{...?countryLanguages[country], app, 'en'}.toList();
 }
 
-/// Nutri-Score grades carry no colour in Owned (Cal AI's greys): the letter
-/// says it. A and B in ink, C in mid grey, D and E outlined.
-Color nutriscoreColor(final String grade) => const Color(0xFF1E1A22);
-
-class NutriscoreBadge extends StatelessWidget {
-  const NutriscoreBadge(this.grade, {this.size = 26.0});
-
-  final String grade;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    label: 'Nutri-Score ${grade.toUpperCase()}',
-    excludeSemantics: true,
-    child: Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6F5FC),
-        borderRadius: BorderRadius.circular(size / 4),
-      ),
-      child: Text(
-        grade.toUpperCase(),
-        style: TextStyle(
-          color: const Color(0xFF1E1A22),
-          fontWeight: FontWeight.w800,
-          fontSize: size * 0.55,
-          height: 1.0,
-        ),
-      ),
-    ),
-  );
-}
-
-/// Square product thumbnail with a neutral placeholder.
+/// Product photo with Cal AI's light grey placeholder (a cart, no colour).
 class SearchHitImage extends StatelessWidget {
-  const SearchHitImage(this.url, {this.size = 52.0});
+  const SearchHitImage(this.url, {this.size = 52.0, this.radius = 14.0});
 
   final String? url;
   final double size;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
-    final Color background = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     final Widget placeholder = Icon(
-      Icons.shopping_basket_outlined,
-      size: size * 0.5,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
+      CupertinoIcons.cart,
+      size: size * 0.36,
+      color: dark ? BrandColors.mutedDark : BrandColors.faint,
     );
     return ClipRRect(
-      borderRadius: ANGULAR_BORDER_RADIUS,
+      borderRadius: BorderRadius.circular(radius),
       child: Container(
         width: size,
         height: size,
-        color: background,
+        color: dark ? BrandColors.hairlineDark : const Color(0xFFEFEEF4),
         alignment: Alignment.center,
         child: url == null
             ? placeholder
@@ -125,7 +93,9 @@ class SearchHitImage extends StatelessWidget {
   }
 }
 
-/// One product in the search suggestions or results.
+/// One product in the search suggestions or results, as a Cal AI row: the
+/// photo flush on the left, the name and brand, and the owner as the big
+/// line with its moral score.
 class SearchHitTile extends StatelessWidget {
   const SearchHitTile({
     required this.hit,
@@ -138,10 +108,10 @@ class SearchHitTile extends StatelessWidget {
   final SearchHit hit;
   final VoidCallback onTap;
 
-  /// When loaded, the tile shows "Ejet af X" from the offline database.
+  /// When loaded, the tile shows the owner from the offline database.
   final OwnershipLocalDb? ownerDb;
 
-  /// When loaded, the owner's ethics score is shown next to the owner.
+  /// When loaded, the owner's moral score is shown next to the owner.
   final EthicsDb? ethicsDb;
   final bool dense;
 
@@ -152,77 +122,84 @@ class SearchHitTile extends StatelessWidget {
     final String? owner = info?.displayName;
     final int? ethics = info?.ethicsScore;
     final bool avoided = info != null && AvoidedOwners.instance.isAvoided(info.names);
-    final Color ownerColor = avoided ? theme.colorScheme.error : theme.colorScheme.primary;
     final String subtitle = <String?>[hit.firstBrand, displayQuantity(hit.quantity)]
         .whereType<String>()
         .join(' · ');
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsetsDirectional.symmetric(
-          horizontal: LARGE_SPACE,
-          vertical: dense ? SMALL_SPACE : BALANCED_SPACE,
-        ),
-        child: Row(
-          children: <Widget>[
-            SearchHitImage(hit.imageUrl, size: dense ? 44.0 : 56.0),
-            const SizedBox(width: MEDIUM_SPACE),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    hit.name ?? hit.barcode,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                    ),
-                  ),
-                  if (subtitle.isNotEmpty)
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+    final double height = dense ? 76.0 : 92.0;
+    final Color muted = theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 0.0, kCalSide, dense ? 8.0 : 10.0),
+      child: PressScale(
+        scale: 0.98,
+        onTap: onTap,
+        child: Container(
+          height: height,
+          decoration: calRowDecoration(context),
+          clipBehavior: Clip.antiAlias,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              SearchHitImage(hit.imageUrl, size: height, radius: 0.0),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 12.0, 0.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        hit.name ?? hit.barcode,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15.0, letterSpacing: -0.2),
                       ),
-                    ),
-                  if (owner != null)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(top: 2.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            avoided ? Icons.block_rounded : Icons.account_tree_outlined,
-                            size: 14.0,
-                            color: ownerColor,
-                          ),
-                          const SizedBox(width: VERY_SMALL_SPACE),
-                          Flexible(
-                            child: Text(
-                              avoided ? 'You avoid $owner' : 'Owned by $owner',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: ownerColor,
-                                fontWeight: avoided ? FontWeight.w800 : FontWeight.w600,
+                      if (subtitle.isNotEmpty)
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),
+                        ),
+                      if (owner != null) ...<Widget>[
+                        const SizedBox(height: 4.0),
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              avoided ? CupertinoIcons.nosign : CupertinoIcons.building_2_fill,
+                              size: 15.0,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            const SizedBox(width: 6.0),
+                            Flexible(
+                              child: Text(
+                                avoided ? 'You avoid $owner' : owner,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontSize: dense ? 15.0 : 16.0,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: -0.3,
+                                ),
                               ),
                             ),
-                          ),
-                          if (ethics != null) ...<Widget>[
-                            const SizedBox(width: SMALL_SPACE),
-                            EthicsChip(score: ethics),
+                            if (ethics != null) ...<Widget>[
+                              const SizedBox(width: 10.0),
+                              Icon(Icons.balance_rounded, size: 13.0, color: theme.colorScheme.onSurface),
+                              const SizedBox(width: 3.0),
+                              Text(
+                                '$ethics',
+                                style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),
+                              ),
+                            ],
                           ],
-                        ],
-                      ),
-                    ),
-                ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -278,32 +255,4 @@ class OwnerInfo {
 
   /// Every name the owner goes by (display, database, chain, controller).
   final List<String> names;
-}
-
-/// Small "Etik 55" pill in the owner's ethics colour.
-class EthicsChip extends StatelessWidget {
-  const EthicsChip({required this.score});
-
-  final int score;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color = ScoreBand.of(score).color;
-    final Color text = readableOn(color, Theme.of(context).colorScheme.surface);
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(horizontal: 6.0, vertical: 1.0),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Text(
-        'Moral $score',
-        style: TextStyle(
-          color: text,
-          fontSize: 11.0,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
 }

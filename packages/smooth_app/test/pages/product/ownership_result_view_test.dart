@@ -11,6 +11,7 @@ import 'package:smooth_app/services/ownership_service.dart';
 import 'package:smooth_app/themes/color_provider.dart';
 import 'package:smooth_app/themes/contrast_provider.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 import '../../tests_utils/mocks.dart';
 
@@ -51,7 +52,7 @@ Future<void> _pumpOwnershipWidget(
     ),
   );
   // Not `pumpAndSettle`: `OwnershipLoadingView` contains a
-  // `CircularProgressIndicator`, which animates forever and would make
+  // `CalLoader`, which animates forever and would make
   // `pumpAndSettle` time out waiting for a frame that never stops scheduling.
   await tester.pump();
 }
@@ -173,7 +174,7 @@ void main() {
         const OwnershipLoadingView(label: 'Læser billedet…'),
       );
       expect(find.text('Læser billedet…'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CalLoader), findsOneWidget);
     });
   });
 }

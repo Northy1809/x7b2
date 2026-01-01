@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/owner_insights.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// Everything about one company: what it is, its ethics record, the brands
 /// it owns, what the user scanned from it, and a switch to avoid it.
@@ -128,7 +130,7 @@ class _OwnerPageState extends State<OwnerPage> {
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsetsDirectional.all(VERY_LARGE_SPACE),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CalLoader()),
                   ),
                 )
               else ...<Widget>[
@@ -191,17 +193,24 @@ class _OwnerHero extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                const BackButton(),
-                const Spacer(),
-                if (shareCard != null)
-                  IconButton(
-                    tooltip: 'Share',
-                    icon: const Icon(Icons.ios_share_rounded),
-                    onPressed: () => showShareCard(context, shareCard!),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 0.0, 0.0),
+              child: Row(
+                children: <Widget>[
+                  CalRoundButton(
+                    icon: CupertinoIcons.arrow_left,
+                    tooltip: 'Back',
+                    onTap: () => Navigator.of(context).maybePop(),
                   ),
-              ],
+                  const Spacer(),
+                  if (shareCard != null)
+                    CalRoundButton(
+                      icon: CupertinoIcons.share,
+                      tooltip: 'Share',
+                      onTap: () => showShareCard(context, shareCard!),
+                    ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 12.0, top: 4.0),
@@ -317,16 +326,12 @@ class _ScannedCard extends StatelessWidget {
           padding: const EdgeInsetsDirectional.symmetric(horizontal: LARGE_SPACE),
           child: SectionLabel('You scanned ${products.length} from $name'),
         ),
+        const SizedBox(height: 6.0),
         for (final Product p in products.take(20))
-          ListTile(
-            contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: LARGE_SPACE),
-            title: Text(
-              productDisplayName(p) ?? p.barcode ?? '',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: p.brands == null ? null : Text(p.brands!.split(',').first.trim()),
-            trailing: const Icon(Icons.chevron_right_rounded),
+          CalNavRow(
+            icon: CupertinoIcons.cart,
+            title: productDisplayName(p) ?? p.barcode ?? '',
+            subtitle: p.brands?.split(',').first.trim(),
             onTap: () => AppNavigator.of(context).push(AppRoutes.PRODUCT(p.barcode!), extra: p),
           ),
         if (products.length > 20)
@@ -364,10 +369,10 @@ class _BrandsCard extends StatelessWidget {
             runSpacing: SMALL_SPACE,
             children: <Widget>[
               for (final String b in brands)
-                ActionChip(
-                  avatar: const Icon(Icons.sell_rounded, size: 16.0),
-                  label: Text(b),
-                  onPressed: () => Navigator.of(context).push<void>(
+                CalPill(
+                  icon: CupertinoIcons.tag,
+                  label: b,
+                  onTap: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
                       builder: (_) => SearchPage(SearchProductHelper(), autofocus: false, initialQuery: b),
                     ),

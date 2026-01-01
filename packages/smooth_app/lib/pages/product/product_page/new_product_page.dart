@@ -22,11 +22,13 @@ import 'package:smooth_app/pages/product/product_page/footer/new_product_footer.
 import 'package:smooth_app/pages/product/product_page/header/product_page_tabs.dart';
 import 'package:smooth_app/pages/product/product_page/new_product_header.dart';
 import 'package:smooth_app/pages/product/product_page/new_product_page_loading_indicator.dart';
+import 'package:smooth_app/pages/product/product_page/overview/product_facts_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/product_overview.dart';
 import 'package:smooth_app/pages/product/product_page/product_page_tab_controller.dart';
 import 'package:smooth_app/pages/product/product_questions_widget.dart';
 import 'package:smooth_app/pages/product/summary_card.dart';
 import 'package:smooth_app/pages/scan/carousel/scan_carousel_manager.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/smooth_scaffold.dart';
 import 'package:smooth_app/widgets/widget_height.dart';
 
@@ -150,15 +152,8 @@ class ProductPageState extends State<ProductPage>
     ),
   );
 
-  void _openDetails() => Navigator.of(context).push<void>(
-    MaterialPageRoute<void>(
-      builder: (BuildContext context) => ProductPage(
-        upToDateProduct,
-        withHeroAnimation: false,
-        detailed: true,
-      ),
-    ),
-  );
+  /// Owned's own details page, not Open Food Facts' tabbed one (16/11).
+  void _openDetails() => ProductFactsPage.open(context, upToDateProduct);
 
   Widget _buildTabLayout(
     bool hasPendingOperations,
@@ -211,7 +206,7 @@ class ProductPageState extends State<ProductPage>
                     .toList(growable: false),
               ),
             )
-          : const Center(child: CircularProgressIndicator()),
+          : const Center(child: CalLoader()),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[

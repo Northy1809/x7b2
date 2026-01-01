@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/data_models/continuous_scan_model.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
-import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/ethics_details.dart';
 import 'package:smooth_app/pages/scan/result/result_sheet_parts.dart';
@@ -20,6 +19,7 @@ import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/ownership_service.dart';
 import 'package:smooth_app/services/photo_analyzer.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// What a photo of a pack opens: the photo stays still while a white line
 /// sweeps it ("Analyzing…"), then the answer pops up from the bottom: the
@@ -349,11 +349,10 @@ class _PhotoResultPageState extends State<PhotoResultPage> {
                 runSpacing: 8.0,
                 children: <Widget>[
                   for (int i = 0; i < others.length; i++)
-                    ChoiceChip(
-                      label: Text(others[i].name),
+                    CalPill(
+                      label: others[i].name,
                       selected: i == _chosen,
-                      showCheckmark: false,
-                      onSelected: (_) => setState(() => _chosen = i),
+                      onTap: () => setState(() => _chosen = i),
                     ),
                 ],
               ),
@@ -378,15 +377,6 @@ class _PhotoResultPageState extends State<PhotoResultPage> {
                   detail: 'Brands, record and your scans',
                   onTap: openOwner,
                 ),
-                if (barcode != null)
-                  MoreRow(
-                    icon: Icons.add_circle_outline_rounded,
-                    title: 'Add it to Open Food Facts',
-                    detail: 'Barcode $barcode · not in the database yet',
-                    onTap: () => AppNavigator.of(
-                      context,
-                    ).push(AppRoutes.PRODUCT_CREATOR(barcode)),
-                  ),
               ],
             ),
           ],

@@ -1,13 +1,14 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/search/search_hit_tile.dart';
 import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/product_search_service.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// One query feeding the result list. Sources run in order: when the first
 /// runs out of pages, the next one continues the list under its [title].
@@ -28,7 +29,6 @@ class _Source {
 class ProductSearchResultsView extends StatefulWidget {
   const ProductSearchResultsView({
     required this.query,
-    required this.legacyBuilder,
     super.key,
     this.category,
     this.service,
@@ -40,9 +40,6 @@ class ProductSearchResultsView extends StatefulWidget {
 
   /// When set, list this category instead of a text search.
   final CategorySuggestion? category;
-
-  /// The classic OFF search, used if search-a-licious is unreachable.
-  final Future<Widget> Function() legacyBuilder;
 
   final ProductSearchService? service;
 
@@ -65,7 +62,7 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
   int _sourceIndex = 0;
   bool _loading = false;
   bool _initialised = false;
-  Future<Widget>? _legacy;
+  bool _failed = false;
   OwnershipLocalDb? _ownerDb;
   EthicsDb? _ethicsDb;
 
@@ -197,7 +194,7 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
       setState(() {
         _loading = false;
         if (_hitCount == 0 && _sourceIndex == 0) {
-          _legacy = widget.legacyBuilder();
+          _failed = true;
         } else {
           // Skip a failing extra source instead of retrying it forever.
           _sourceIndex++;
@@ -212,16 +209,22 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_legacy != null) {
-      return FutureBuilder<Widget>(
-        future: _legacy,
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) =>
-            snapshot.data ?? const Center(child: CircularProgressIndicator()),
+    if (_failed) {
+      return Center(
+        child: SingleChildScrollView(
+          child: CalEmpty(
+            icon: CupertinoIcons.wifi_slash,
+            title: 'Search is not answering',
+            body: 'Check your connection and try again. Brands still answer offline: type one to see its owner.',
+            action: 'Try again',
+            onAction: _retry,
+          ),
+        ),
       );
     }
     final ThemeData theme = Theme.of(context);
     if (!_initialised || (_items.isEmpty && _loading)) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CalLoader(label: 'Searching…'));
     }
     if (_items.isEmpty) {
       return _EmptyResults(query: widget.query);
@@ -231,6 +234,18 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
       listenable: AvoidedOwners.instance,
       builder: (BuildContext context, _) => _list(theme, total),
     );
+  }
+
+  void _retry() {
+    setState(() {
+      _failed = false;
+      _sources.clear();
+      _items.clear();
+      _seen.clear();
+      _sourceIndex = 0;
+      _initialised = false;
+    });
+    unawaited(_init());
   }
 
   bool _fromAvoided(final SearchHit hit) {
@@ -251,6 +266,7 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
         if (kept[i] is! String || (i + 1 < kept.length && kept[i + 1] is SearchHit)) kept[i],
     ];
     final bool allHidden = hidden > 0 && !items.any((Object o) => o is SearchHit);
+    final Color muted = theme.colorScheme.onSurfaceVariant;
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification n) {
         if (n.metrics.extentAfter < 600 && _hasMore && !_loading) {
@@ -260,40 +276,34 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
       },
       child: ListView.builder(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsetsDirectional.only(bottom: VERY_LARGE_SPACE),
+        padding: EdgeInsetsDirectional.only(bottom: MediaQuery.paddingOf(context).bottom + 120.0),
         itemCount: items.length + 2,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             final Widget count = Text(
-                widget.category != null
-                    ? '${widget.category!.name}: ${_formatCount(total)} products'
-                    : total > 0
-                    ? '${_formatCount(total)} products match "${widget.query}"'
-                    : 'Suggestions for "${widget.query}"',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                ),
-              );
+              widget.category != null
+                  ? '${widget.category!.name}: ${_formatCount(total)} products'
+                  : total > 0
+                  ? '${_formatCount(total)} products match "${widget.query}"'
+                  : 'Suggestions for "${widget.query}"',
+              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 15.0, color: muted),
+            );
             return Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(LARGE_SPACE, MEDIUM_SPACE, LARGE_SPACE, VERY_SMALL_SPACE),
+              padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 8.0, kCalSide, 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   count,
                   if (canHide)
                     Padding(
-                      padding: const EdgeInsetsDirectional.only(top: SMALL_SPACE),
-                      child: FilterChip(
-                        avatar: const Icon(Icons.block_rounded, size: 18.0),
-                        label: Text(
-                          avoided.hideInSearch && hidden > 0
-                              ? 'Hiding $hidden from companies you avoid'
-                              : 'Hide companies you avoid',
-                        ),
+                      padding: const EdgeInsetsDirectional.only(top: 10.0),
+                      child: CalPill(
+                        icon: CupertinoIcons.nosign,
+                        label: avoided.hideInSearch && hidden > 0
+                            ? 'Hiding $hidden from companies you avoid'
+                            : 'Hide companies you avoid',
                         selected: avoided.hideInSearch,
-                        showCheckmark: false,
-                        onSelected: (bool on) => unawaited(avoided.setHideInSearch(on)),
+                        onTap: () => unawaited(avoided.setHideInSearch(!avoided.hideInSearch)),
                       ),
                     ),
                 ],
@@ -303,12 +313,12 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
           if (index == items.length + 1) {
             if (_hasMore) {
               return const Padding(
-                padding: EdgeInsetsDirectional.all(LARGE_SPACE),
-                child: Center(child: CircularProgressIndicator()),
+                padding: EdgeInsetsDirectional.all(24.0),
+                child: Center(child: CalLoader(size: 24.0)),
               );
             }
             return Padding(
-              padding: const EdgeInsetsDirectional.all(LARGE_SPACE),
+              padding: const EdgeInsetsDirectional.fromSTEB(kCalSide + 8.0, 16.0, kCalSide + 8.0, 16.0),
               child: Text(
                 allHidden
                     ? 'Every product here is from a company you avoid. '
@@ -316,37 +326,23 @@ class _ProductSearchResultsViewState extends State<ProductSearchResultsView> {
                     : 'Not what you were looking for? Try a brand or another word, '
                           'or snap the product.',
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+                style: theme.textTheme.bodyMedium?.copyWith(fontSize: 15.0, height: 1.35, color: muted),
               ),
             );
           }
           final Object item = items[index - 1];
           if (item is String) {
             return Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(
-                LARGE_SPACE,
-                VERY_LARGE_SPACE,
-                LARGE_SPACE,
-                VERY_SMALL_SPACE,
-              ),
-              child: Text(
-                item,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 18.0, kCalSide, 12.0),
+              child: CalSectionTitle(item),
             );
           }
           final SearchHit hit = item as SearchHit;
           return SearchHitTile(
             hit: hit,
             ownerDb: _ownerDb,
-              ethicsDb: _ethicsDb,
-            onTap: () => AppNavigator.of(
-              context,
-            ).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
+            ethicsDb: _ethicsDb,
+            onTap: () => AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
           );
         },
       ),
@@ -372,34 +368,13 @@ class _EmptyResults extends StatelessWidget {
   final String query;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsetsDirectional.all(VERY_LARGE_SPACE),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(
-            Icons.search_off,
-            size: 48.0,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: MEDIUM_SPACE),
-          Text(
-            'No products found for "$query"',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: SMALL_SPACE),
-          Text(
-            'Check the spelling, try fewer words, or snap the product.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) => Center(
+    child: SingleChildScrollView(
+      child: CalEmpty(
+        icon: CupertinoIcons.search,
+        title: 'No products found for "$query"',
+        body: 'Check the spelling, try fewer words, or snap the product.',
       ),
-    );
-  }
+    ),
+  );
 }

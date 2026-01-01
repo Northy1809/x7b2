@@ -60,7 +60,6 @@ void main() {
       tester,
       ProductSearchResultsView(
         query: 'nutella',
-        legacyBuilder: () async => const Text('legacy'),
         service: _service(
           text: <Map<String, dynamic>>[_hit('1', 'Nutella'), _hit('2', 'Nutella Go')],
           prefix: <Map<String, dynamic>>[_hit('2', 'Nutella Go'), _hit('3', 'Nutella Biscuits')],
@@ -79,7 +78,6 @@ void main() {
       tester,
       ProductSearchResultsView(
         query: 'nutella',
-        legacyBuilder: () async => const Text('legacy'),
         service: _service(
           text: <Map<String, dynamic>>[_hit('1', 'Nutella')],
           prefix: <Map<String, dynamic>>[_hit('1', 'Nutella')],
@@ -90,18 +88,18 @@ void main() {
     expect(find.text('More suggestions'), findsNothing);
   });
 
-  testWidgets('falls back to the classic search when the engine is down', (
+  testWidgets('says so and offers a retry when the engine is down', (
     WidgetTester tester,
   ) async {
     await _pump(
       tester,
       ProductSearchResultsView(
         query: 'nutella',
-        legacyBuilder: () async => const Text('legacy'),
         service: _service(text: const <Map<String, dynamic>>[], prefix: const <Map<String, dynamic>>[], status: 503),
       ),
     );
-    expect(find.text('legacy'), findsOneWidget);
+    expect(find.text('Search is not answering'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
   });
 
   testWidgets('empty result explains what to do', (WidgetTester tester) async {
@@ -109,7 +107,6 @@ void main() {
       tester,
       ProductSearchResultsView(
         query: 'xyzzy',
-        legacyBuilder: () async => const Text('legacy'),
         service: _service(text: const <Map<String, dynamic>>[], prefix: const <Map<String, dynamic>>[]),
       ),
     );
@@ -138,7 +135,6 @@ void main() {
       tester,
       ProductSearchResultsView(
         query: 'nutella',
-        legacyBuilder: () async => const Text('legacy'),
         localDb: () async => db,
         service: _service(
           text: <Map<String, dynamic>>[_hit('1', 'Nutella')],

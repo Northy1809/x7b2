@@ -7,6 +7,7 @@ import 'package:smooth_app/pages/product/product_page/overview/owner_section.dar
 import 'package:smooth_app/services/avoided_owners.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// The companies the user avoids, as grey Cal AI rows with a way to take
@@ -55,14 +56,19 @@ class AvoidList extends StatelessWidget {
               _AvoidRow(name: n),
               const SizedBox(height: 8.0),
             ],
-            SwitchListTile.adaptive(
-              contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: 4.0),
-              title: const Text('Hide their products in search'),
-              value: AvoidedOwners.instance.hideInSearch,
-              onChanged: (bool on) {
-                Haptics.select();
-                unawaited(AvoidedOwners.instance.setHideInSearch(on));
-              },
+            const SizedBox(height: 8.0),
+            CalGroup(
+              children: <Widget>[
+                CalSwitchRow(
+                  icon: CupertinoIcons.search,
+                  title: 'Hide their products in search',
+                  value: AvoidedOwners.instance.hideInSearch,
+                  onChanged: (bool on) {
+                    Haptics.select();
+                    unawaited(AvoidedOwners.instance.setHideInSearch(on));
+                  },
+                ),
+              ],
             ),
           ],
         );
@@ -114,10 +120,11 @@ class _AvoidRow extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
+            CalRoundButton(
+              icon: CupertinoIcons.xmark,
+              size: 34.0,
               tooltip: 'Stop avoiding $name',
-              icon: Icon(CupertinoIcons.xmark_circle_fill, color: theme.colorScheme.onSurfaceVariant),
-              onPressed: () {
+              onTap: () {
                 Haptics.remove();
                 unawaited(AvoidedOwners.instance.remove(name));
                 final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
@@ -151,17 +158,12 @@ class AvoidListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Scaffold(
+    return const Scaffold(
+      appBar: CalTopBar(title: 'Companies you avoid'),
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppBar.large(
-            title: const Text('Companies you avoid'),
-            backgroundColor: theme.scaffoldBackgroundColor,
-            surfaceTintColor: Colors.transparent,
-          ),
-          const SliverPadding(
-            padding: EdgeInsetsDirectional.fromSTEB(20.0, 4.0, 20.0, 40.0),
+          SliverPadding(
+            padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 8.0, kCalSide, 40.0),
             sliver: SliverToBoxAdapter(child: AvoidList()),
           ),
         ],

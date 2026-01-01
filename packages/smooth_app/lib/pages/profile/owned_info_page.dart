@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/launch_url_helper.dart';
@@ -6,14 +7,14 @@ import 'package:smooth_app/pages/product/product_page/overview/overview_card.dar
 import 'package:smooth_app/services/ethics_db.dart';
 import 'package:smooth_app/services/health_score.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
-import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// "How Owned works": what each answer in the app is based on.
 enum OwnedInfoTopic {
-  ownership('Who owns it', 'Where the owner comes from', Icons.account_tree_rounded),
-  health('Health score', 'How the 0-100 health score is made', Icons.favorite_rounded),
+  ownership('Who owns it', 'Where the owner comes from', CupertinoIcons.building_2_fill),
+  health('Health score', 'How the 0-100 health score is made', CupertinoIcons.heart),
   ethics('Moral score', 'How companies are rated, and the sources', Icons.balance_rounded),
-  data('Data and privacy', 'Sources, licences and what stays on your phone', Icons.shield_rounded);
+  data('Data and privacy', 'Sources, licences and what stays on your phone', CupertinoIcons.lock_shield);
 
   const OwnedInfoTopic(this.title, this.subtitle, this.icon);
 
@@ -29,7 +30,7 @@ class OwnedInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(topic.title)),
+    appBar: CalTopBar(title: topic.title),
     body: ListView(
       padding: const EdgeInsetsDirectional.symmetric(vertical: MEDIUM_SPACE),
       children: switch (topic) {
@@ -168,7 +169,10 @@ class _Block extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(fontSize: 17.0, fontWeight: FontWeight.w600, letterSpacing: -0.4),
+          ),
           for (final String p in paragraphs)
             Padding(
               padding: const EdgeInsetsDirectional.only(top: SMALL_SPACE),
@@ -184,7 +188,7 @@ class _Block extends StatelessWidget {
                     width: 7.0,
                     height: 7.0,
                     margin: const EdgeInsetsDirectional.only(top: 7.0, end: 10.0),
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: BrandColors.gold),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: theme.colorScheme.onSurface),
                   ),
                   Expanded(child: Text(b, style: body)),
                 ],
@@ -195,12 +199,13 @@ class _Block extends StatelessWidget {
               padding: const EdgeInsetsDirectional.only(top: SMALL_SPACE),
               child: Wrap(
                 spacing: SMALL_SPACE,
+                runSpacing: SMALL_SPACE,
                 children: <Widget>[
                   for (final (String label, String url) in links)
-                    TextButton.icon(
-                      onPressed: () => LaunchUrlHelper.launchURL(url),
-                      icon: const Icon(Icons.open_in_new_rounded, size: 16.0),
-                      label: Text(label),
+                    CalPill(
+                      icon: CupertinoIcons.arrow_up_right,
+                      label: label,
+                      onTap: () => LaunchUrlHelper.launchURL(url),
                     ),
                 ],
               ),

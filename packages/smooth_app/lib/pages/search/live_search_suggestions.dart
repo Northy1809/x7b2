@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/haptics.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
@@ -16,6 +15,7 @@ import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_norm.dart';
 import 'package:smooth_app/services/product_search_service.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// Suggestions shown while the user types in the product search:
@@ -223,6 +223,7 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
   Widget _build(final BuildContext context) {
     final List<SearchHit> products = _shownProducts;
     final ThemeData theme = Theme.of(context);
+    final Color muted = theme.colorScheme.onSurfaceVariant;
     final String text = widget.text.trim();
     final String lower = text.toLowerCase();
     final List<String> history = widget.history
@@ -237,92 +238,59 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
     final LocalOwnerResult? brandOwner = _brandOwner(text);
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsetsDirectional.only(bottom: VERY_LARGE_SPACE),
+      padding: EdgeInsetsDirectional.only(top: 4.0, bottom: MediaQuery.paddingOf(context).bottom + 120.0),
       children: <Widget>[
         if (brandOwner != null)
           BrandOwnerAnswer(brand: text, result: brandOwner, ethicsDb: _ethicsDb),
-        ListTile(
-          leading: const Icon(Icons.search),
+        _SuggestionRow(
+          leading: Icon(CupertinoIcons.search, size: 19.0, color: theme.colorScheme.onSurface),
           title: Text.rich(
             TextSpan(
               children: <InlineSpan>[
                 const TextSpan(text: 'Search for '),
-                TextSpan(
-                  text: '"$text"',
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
+                TextSpan(text: '"$text"', style: const TextStyle(fontWeight: FontWeight.w600)),
               ],
             ),
           ),
           trailing: _loading || stale
-              ? const SizedBox.square(
-                  dimension: 18.0,
-                  child: CircularProgressIndicator(strokeWidth: 2.0),
-                )
-              : const Icon(Icons.north_west, size: 18.0),
+              ? const CalLoader(size: 18.0, stroke: 2.0)
+              : Icon(CupertinoIcons.arrow_up_left, size: 16.0, color: muted),
           onTap: () => widget.onSearch(text),
         ),
         for (final OwnerRef owner in _owners(text))
-          ListTile(
+          _SuggestionRow(
             leading: OwnerAvatar(name: owner.name, size: 36.0),
-            title: Text(owner.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text(
-              owner.company == null
-                  ? 'Company · see its brands'
-                  : 'Company · Ethics ${EthicsScore.compute(owner.company!).score}/100',
-            ),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            title: Text(owner.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+            subtitle: owner.company == null
+                ? 'Company · see its brands'
+                : 'Company · moral score ${EthicsScore.compute(owner.company!).score}',
+            trailing: Icon(CupertinoIcons.chevron_right, size: 15.0, color: muted),
             onTap: () => openOwnerPage(context, name: owner.name, dbName: owner.dbName, company: owner.company),
           ),
         for (final String q in history)
-          ListTile(
-            dense: true,
-            leading: const Icon(Icons.history),
+          _SuggestionRow(
+            leading: Icon(CupertinoIcons.clock, size: 19.0, color: muted),
             title: Text(q),
             onTap: () => widget.onSearch(q),
           ),
         if (_brands.isNotEmpty || _categories.isNotEmpty)
           Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(
-              LARGE_SPACE,
-              SMALL_SPACE,
-              LARGE_SPACE,
-              SMALL_SPACE,
-            ),
+            padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 6.0, kCalSide, 8.0),
             child: Wrap(
-              spacing: SMALL_SPACE,
-              runSpacing: SMALL_SPACE,
+              spacing: 8.0,
+              runSpacing: 8.0,
               children: <Widget>[
                 for (final String brand in _brands)
-                  ActionChip(
-                    avatar: const Icon(Icons.sell_outlined, size: 18.0),
-                    label: Text(brand),
-                    onPressed: () => widget.onSearch(brand),
-                  ),
+                  CalPill(icon: CupertinoIcons.tag, label: brand, onTap: () => widget.onSearch(brand)),
                 for (final CategorySuggestion c in _categories)
-                  ActionChip(
-                    avatar: const Icon(Icons.category_outlined, size: 18.0),
-                    label: Text(c.name),
-                    onPressed: () => widget.onCategory(c),
-                  ),
+                  CalPill(icon: CupertinoIcons.square_grid_2x2, label: c.name, onTap: () => widget.onCategory(c)),
               ],
             ),
           ),
         if (products.isNotEmpty) ...<Widget>[
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(
-              LARGE_SPACE,
-              MEDIUM_SPACE,
-              LARGE_SPACE,
-              VERY_SMALL_SPACE,
-            ),
-            child: Text(
-              'Products',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 18.0, kCalSide, 12.0),
+            child: CalSectionTitle('Products'),
           ),
           for (final SearchHit hit in products)
             SearchHitTile(
@@ -330,37 +298,104 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
               dense: true,
               ownerDb: _ownerDb,
               ethicsDb: _ethicsDb,
-              onTap: () => AppNavigator.of(
-                context,
-              ).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
+              onTap: () => AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(hit.barcode)),
             ),
-          ListTile(
-            title: Text(
-              'Show all results',
-              style: TextStyle(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 6.0, kCalSide, 0.0),
+            child: OutlinedButton(
+              onPressed: () => widget.onSearch(text),
+              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50.0)),
+              child: const Text('Show all results'),
             ),
-            trailing: Icon(
-              Icons.arrow_forward,
-              color: theme.colorScheme.primary,
-            ),
-            onTap: () => widget.onSearch(text),
           ),
         ] else if (!_loading && !stale && text.length >= 2)
           Padding(
-            padding: const EdgeInsetsDirectional.all(LARGE_SPACE),
+            padding: const EdgeInsetsDirectional.fromSTEB(kCalSide + 4.0, 12.0, kCalSide + 4.0, 0.0),
             child: Text(
               _failed
                   ? 'Could not load suggestions right now. Tap search to try again.'
                   : 'No suggestions yet. Tap search for a wider search.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 15.0, color: muted),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// A plain suggestion: icon, words (and a grey line), something on the
+/// right. White with a grey press, as rows in Cal AI's lists.
+class _SuggestionRow extends StatefulWidget {
+  const _SuggestionRow({required this.leading, required this.title, required this.onTap, this.subtitle, this.trailing});
+
+  final Widget leading;
+  final Widget title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback onTap;
+
+  @override
+  State<_SuggestionRow> createState() => _SuggestionRowState();
+}
+
+class _SuggestionRowState extends State<_SuggestionRow> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _down = true),
+        onTapUp: (_) => setState(() => _down = false),
+        onTapCancel: () => setState(() => _down = false),
+        onTap: () {
+          Haptics.tap();
+          widget.onTap();
+        },
+        child: AnimatedContainer(
+          duration: CalMotion.select,
+          margin: const EdgeInsetsDirectional.symmetric(horizontal: kCalSide - 10.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(10.0, 11.0, 10.0, 11.0),
+          decoration: BoxDecoration(
+            color: _down ? calFill(context) : Colors.transparent,
+            borderRadius: BorderRadius.circular(14.0),
+          ),
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 36.0, child: Center(child: widget.leading)),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    DefaultTextStyle.merge(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16.0, letterSpacing: -0.3),
+                      child: widget.title,
+                    ),
+                    if (widget.subtitle != null)
+                      Text(
+                        widget.subtitle!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 13.0,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (widget.trailing != null) ...<Widget>[const SizedBox(width: 8.0), widget.trailing!],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -383,7 +418,7 @@ class BrandOwnerAnswer extends StatelessWidget {
     final int? score = company == null ? null : EthicsScore.compute(company).score;
     final String shown = brand.isEmpty ? brand : brand[0].toUpperCase() + brand.substring(1);
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 6.0),
+      padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 4.0, kCalSide, 10.0),
       child: Semantics(
         button: true,
         label: '$shown is owned by $owner${score == null ? '' : ', moral score $score'}',

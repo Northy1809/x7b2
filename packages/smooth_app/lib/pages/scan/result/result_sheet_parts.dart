@@ -4,6 +4,7 @@ import 'package:smooth_app/helpers/haptics.dart';
 import 'package:smooth_app/pages/product/product_page/overview/score_donut.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// Building blocks of the result sheet (photo or barcode scan, history,
@@ -340,15 +341,11 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
+      appBar: CalTopBar(title: title),
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppBar.large(
-            title: Text(title),
-            backgroundColor: theme.scaffoldBackgroundColor,
-            surfaceTintColor: Colors.transparent,
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8.0)),
           SliverToBoxAdapter(child: child),
           const SliverToBoxAdapter(child: SizedBox(height: 40.0)),
         ],

@@ -13,6 +13,7 @@ import 'package:smooth_app/services/owner_overrides.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// The Companies tab (Owned's answer to Cal AI's "Progress"): how many
@@ -109,7 +110,7 @@ class _CompaniesPageState extends State<CompaniesPage> {
               if (i == null)
                 const Padding(
                   padding: EdgeInsetsDirectional.symmetric(vertical: 24.0),
-                  child: Center(child: CircularProgressIndicator.adaptive()),
+                  child: Center(child: CalLoader()),
                 )
               else if (owners.isEmpty)
                 FadeUpIn(

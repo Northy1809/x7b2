@@ -18,6 +18,7 @@ import 'package:smooth_app/services/owner_overrides.dart';
 import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/services/ownership_service.dart';
 import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 import 'package:smooth_app/widgets/company_logo.dart';
 
 /// "Who owns it": the owner, a short note on the company, and the trail
@@ -204,7 +205,7 @@ class OwnerSection extends StatelessWidget {
   }) => Navigator.of(context).push<void>(
     MaterialPageRoute<void>(
       builder: (BuildContext routeContext) => Scaffold(
-        appBar: AppBar(title: const Text('Find the owner')),
+        appBar: const CalTopBar(title: 'Find the owner'),
         body: ProductOwnershipTab(
           product,
           askUser: askUser,

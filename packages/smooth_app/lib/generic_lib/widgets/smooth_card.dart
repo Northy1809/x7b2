@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/themes/brand_colors.dart';
 import 'package:smooth_app/themes/smooth_theme_colors.dart';
 import 'package:smooth_app/themes/theme_provider.dart';
 
@@ -15,8 +16,8 @@ class SmoothCard extends StatelessWidget {
     required this.child,
     this.color,
     this.margin = const EdgeInsetsDirectional.symmetric(
-      horizontal: SMALL_SPACE,
-      vertical: VERY_SMALL_SPACE,
+      horizontal: 24.0,
+      vertical: 7.0,
     ),
     this.padding = const EdgeInsetsDirectional.all(5.0),
     this.elevation = 8.0,
@@ -82,17 +83,24 @@ class SmoothCard extends StatelessWidget {
       );
     }
 
-    result = Material(
-      elevation: elevation,
-      shadowColor: elevationColor ?? const Color.fromARGB(25, 0, 0, 0),
-      borderRadius: borderRadius ?? ROUNDED_BORDER_RADIUS,
-      color:
-          color ??
-          (Theme.of(context).brightness == Brightness.light
-              ? Colors.white
-              : Colors.black),
-      clipBehavior: clipBehavior ?? Clip.none,
-      child: result,
+    // Owned (16/11): Cal AI's card everywhere instead of Material's
+    // elevated sheet: white, 20 pt corners, a faint border and the soft
+    // Cal shadow (none for the flat variant).
+    final bool light = Theme.of(context).brightness == Brightness.light;
+    final BorderRadiusGeometry radius = borderRadius ?? BorderRadius.circular(20.0);
+    result = DecoratedBox(
+      decoration: BoxDecoration(
+        color: color ?? (light ? BrandColors.card : BrandColors.cardDark),
+        borderRadius: radius,
+        border: Border.all(color: light ? const Color(0xFFF3F2F7) : BrandColors.hairlineDark),
+        boxShadow: light && elevation > 0 ? BrandColors.cardShadow : null,
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: radius,
+        clipBehavior: clipBehavior ?? Clip.none,
+        child: result,
+      ),
     );
 
     return margin == null ? result : Padding(padding: margin!, child: result);

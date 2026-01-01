@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/data_models/preferences/user_preferences.dart';
 import 'package:smooth_app/helpers/provider_helper.dart';
-import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/companies/avoid_list.dart';
 import 'package:smooth_app/pages/preferences/user_preferences_dev_mode.dart';
 import 'package:smooth_app/pages/scan/carousel/scan_carousel_manager.dart';
@@ -132,7 +131,6 @@ class PageManagerState extends State<PageManager> {
         ? BottomNavigationTab.HomePage
         : BottomNavigationTab.Scan;
 
-    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     final ExternalScanCarouselManagerState carouselManager =
         ExternalScanCarouselManager.watch(context);
 
@@ -166,10 +164,10 @@ class PageManagerState extends State<PageManager> {
           selectedIcon: Icon(CupertinoIcons.chart_bar_fill),
           label: 'Companies',
         ),
-        SmoothNavigationDestination(
-          icon: const Icon(CupertinoIcons.person),
-          selectedIcon: const Icon(CupertinoIcons.person_fill),
-          label: appLocalizations.profile_navbar_label,
+        const SmoothNavigationDestination(
+          icon: Icon(CupertinoIcons.person),
+          selectedIcon: Icon(CupertinoIcons.person_fill),
+          label: 'Profile',
         ),
       ],
       selectedIndex: _currentPage!.index,

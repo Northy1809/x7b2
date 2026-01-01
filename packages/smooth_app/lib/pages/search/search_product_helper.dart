@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_app/data_models/fetched_product.dart';
-import 'package:smooth_app/data_models/preferences/user_preferences.dart';
 import 'package:smooth_app/database/dao_string_list.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/helpers/analytics_helper.dart';
@@ -11,16 +8,15 @@ import 'package:smooth_app/helpers/provider_helper.dart';
 import 'package:smooth_app/helpers/string_extension.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
-import 'package:smooth_app/pages/product/common/product_dialog_helper.dart';
-import 'package:smooth_app/pages/product/common/product_query_page_helper.dart';
 import 'package:smooth_app/pages/product/common/search_helper.dart';
 import 'package:smooth_app/pages/search/live_search_suggestions.dart';
 import 'package:smooth_app/pages/search/product_search_results_view.dart';
-import 'package:smooth_app/pages/search/product_type_search_selector.dart';
-import 'package:smooth_app/query/keywords_product_query.dart';
 import 'package:smooth_app/services/product_search_service.dart';
 
 /// Search helper dedicated to product search.
+/// 16/11: every search goes through the fast engine with Owned's own
+/// results page; a barcode opens Owned's product loader. Open Food Facts'
+/// classic search page, product-type switch and dialogs are gone.
 class SearchProductHelper extends SearchHelper {
   SearchProductHelper();
 
@@ -28,21 +24,11 @@ class SearchProductHelper extends SearchHelper {
   String get historyKey => DaoStringList.keySearchProductHistory;
 
   @override
-  String getHintText(final AppLocalizations appLocalizations) =>
-      appLocalizations.search;
+  String getHintText(final AppLocalizations appLocalizations) => 'Brand, product or barcode';
 
   @override
   String getHelpText(final AppLocalizations appLocalizations) =>
-      appLocalizations.search_product_help;
-
-  @override
-  Widget? getLeadingWidget(_) => const ProductTypeSearchSelector();
-
-  /// The fast search engine only indexes food (Open Food Facts), so beauty,
-  /// pet food and other products keep the classic search.
-  static bool get _usesFastSearch =>
-      UserPreferences.getUserPreferencesSync().latestProductType ==
-      ProductType.food;
+      'Type a brand to see who owns it, or a product name or barcode.';
 
   @override
   Widget? buildLiveSuggestions(
@@ -51,7 +37,7 @@ class SearchProductHelper extends SearchHelper {
     required final TextEditingController controller,
     required final FocusNode focusNode,
   }) {
-    if (!_usesFastSearch || text.trim().isEmpty) {
+    if (text.trim().isEmpty) {
       return null;
     }
     return LiveSearchSuggestions(
@@ -71,8 +57,6 @@ class SearchProductHelper extends SearchHelper {
               key: ValueKey<String>('category:${category.tag}'),
               query: category.name,
               category: category,
-              legacyBuilder: () =>
-                  _legacyResults(context, category.name),
             ),
           ),
         );
@@ -98,106 +82,15 @@ class SearchProductHelper extends SearchHelper {
     addQuery(localDatabase, query);
 
     if (query.isBarcode) {
-      _onSubmittedBarcode(
-        query,
-        context,
-        localDatabase,
-        // TODO(monsieurtanuki): we should use searchQueryCallback here too, shouldn't we?
-      );
-    } else {
-      _onSubmittedText(query, context, localDatabase);
-    }
-  }
-
-  // used to be in now defunct `ChoosePage`
-  Future<void> _onSubmittedBarcode(
-    final String value,
-    final BuildContext context,
-    final LocalDatabase localDatabase,
-  ) async {
-    final ProductDialogHelper productDialogHelper = ProductDialogHelper(
-      barcode: value,
-      context: context,
-      localDatabase: localDatabase,
-    );
-    final FetchedProduct fetchedProduct = await productDialogHelper
-        .openBestChoice();
-    if (fetchedProduct.status == FetchedProductStatus.ok &&
-        fetchedProduct.isValid) {
-      // TODO(monsieurtanuki): add OxF to Matomo data?
-      AnalyticsHelper.trackSearch(
-        search: value,
-        searchCategory: 'barcode',
-        searchCount: 1,
-      );
-      if (context.mounted) {
-        AppNavigator.of(context).push(
-          AppRoutes.PRODUCT(
-            fetchedProduct.product!.barcode!,
-            heroTag: 'search_${fetchedProduct.product!.barcode!}',
-          ),
-          extra: fetchedProduct.product,
-        );
-      }
-    } else {
-      AnalyticsHelper.trackSearch(
-        search: value,
-        searchCategory: 'barcode',
-        searchCount: 0,
-      );
-      productDialogHelper.openError(fetchedProduct);
-    }
-  }
-
-  Future<void> _onSubmittedText(
-    final String value,
-    final BuildContext context,
-    final LocalDatabase localDatabase,
-  ) async {
-    if (_usesFastSearch) {
-      emit(
-        SearchQuery(
-          search: value,
-          widget: ProductSearchResultsView(
-            key: ValueKey<String>('text:$value'),
-            query: value,
-            legacyBuilder: () => _legacyResults(context, value),
-          ),
-        ),
-      );
+      AnalyticsHelper.trackSearch(search: query, searchCategory: 'barcode', searchCount: 1);
+      AppNavigator.of(context).push(AppRoutes.PRODUCT_LOADER(query));
       return;
     }
-    final Widget widget = await _legacyResults(context, value);
-    if (!context.mounted) {
-      return;
-    }
-    emit(SearchQuery(search: value, widget: widget));
-  }
-
-  /// The classic Open Food Facts search (slower, fewer results).
-  Future<Widget> _legacyResults(
-    final BuildContext context,
-    final String value,
-  ) async {
-    final LocalDatabase localDatabase = context.read<LocalDatabase>();
-    final List<String> unwantedIngredients =
-        (await UserPreferences.getUserPreferences())
-            .getUnwantedIngredientTags();
-
-    if (!context.mounted) {
-      return const SizedBox.shrink();
-    }
-
-    return ProductQueryPageHelper.getBestChoiceWidget(
-      name: value,
-      localDatabase: localDatabase,
-      productQuery: KeywordsProductQuery(
-        value,
-        productType: UserPreferences.getUserPreferencesSync().latestProductType,
-        unwantedIngredients: unwantedIngredients,
+    emit(
+      SearchQuery(
+        search: query,
+        widget: ProductSearchResultsView(key: ValueKey<String>('text:$query'), query: query),
       ),
-      context: context,
-      editableAppBarTitle: false,
     );
   }
 }
