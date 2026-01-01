@@ -158,16 +158,10 @@ class AvoidListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: CalTopBar(title: 'Companies you avoid'),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverPadding(
-            padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 8.0, kCalSide, 40.0),
-            sliver: SliverToBoxAdapter(child: AvoidList()),
-          ),
-        ],
-      ),
+    return const CalPage(
+      title: 'Companies you avoid',
+      subtitle: 'Owned warns you when a product comes from one of them.',
+      children: <Widget>[AvoidList()],
     );
   }
 }

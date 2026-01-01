@@ -8,19 +8,26 @@ import 'package:smooth_app/helpers/haptics.dart';
 import 'package:smooth_app/l10n/app_localizations.dart';
 import 'package:smooth_app/pages/product/common/search_helper.dart';
 import 'package:smooth_app/pages/product/common/search_preloaded_item.dart';
+import 'package:smooth_app/pages/search/live_search_suggestions.dart';
 import 'package:smooth_app/pages/search/search_product_helper.dart';
+import 'package:smooth_app/services/ethics_db.dart';
+import 'package:smooth_app/services/ownership_local_db.dart';
 import 'package:smooth_app/widgets/cal_kit.dart';
 import 'package:smooth_app/widgets/cal_ui.dart';
 
-/// What the search shows before anything is typed (16/11, Cal AI): the
-/// recent searches as grey rows (tap to search again, × to forget, hold to
-/// edit), "Clear" for all of them, and popular brands as pills to try.
+/// What the search shows before anything is typed, as Cal AI's food
+/// search (16/11): "Recently searched" and "Suggestions" as grey two-line
+/// rows (bold name; the owner and its moral score under it, from the
+/// offline data), a button on the right. Tap = search again; × forgets a
+/// recent search; hold = edit it.
 class SearchHistoryView extends StatefulWidget {
   const SearchHistoryView({
     required this.onTap,
     required this.focusNode,
     required this.searchHelper,
     required this.preloadedList,
+    this.localDb,
+    this.ethicsDb,
   });
 
   final void Function(String) onTap;
@@ -28,16 +35,18 @@ class SearchHistoryView extends StatefulWidget {
   final SearchHelper searchHelper;
   final List<SearchPreloadedItem> preloadedList;
 
+  /// For tests: the bundled databases.
+  final Future<OwnershipLocalDb> Function()? localDb;
+  final Future<EthicsDb> Function()? ethicsDb;
+
   /// Well-known brands with a surprising owner, to show what the search does.
   static const List<String> popularBrands = <String>[
     'KitKat',
-    'Coca-Cola',
-    'Nutella',
-    'Oreo',
-    'Pringles',
+    'Nesquik',
     "Ben & Jerry's",
+    'Pringles',
     'Lipton',
-    'Magnum',
+    'Oreo',
   ];
 
   @override
@@ -46,14 +55,31 @@ class SearchHistoryView extends StatefulWidget {
 
 class _SearchHistoryViewState extends State<SearchHistoryView> {
   List<String> _queries = <String>[];
+  OwnershipLocalDb? _db;
+  EthicsDb? _ethics;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(
+      (widget.localDb ?? OwnershipLocalDb.load)().then((OwnershipLocalDb db) {
+        if (mounted) {
+          setState(() => _db = db);
+        }
+      }, onError: (_) {}),
+    );
+    unawaited(
+      (widget.ethicsDb ?? EthicsDb.load)().then((EthicsDb db) {
+        if (mounted) {
+          setState(() => _ethics = db);
+        }
+      }, onError: (_) {}),
+    );
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchQueries();
-  }
-
-  void _fetchQueries() {
     final LocalDatabase localDatabase = context.watch<LocalDatabase>();
     setState(() => _queries = widget.searchHelper.getAllQueries(localDatabase));
   }
@@ -81,6 +107,19 @@ class _SearchHistoryViewState extends State<SearchHistoryView> {
     widget.focusNode.requestFocus();
   }
 
+  /// "Nestlé · 13": who owns [text] and its moral score, when known.
+  ({String owner, int? score})? _ownerOf(final String text) {
+    final LocalOwnerResult? r = lookupBrandOwner(_db, text, allowSame: true);
+    if (r == null) {
+      return null;
+    }
+    final EthicsCompany? company = _ethics?.forOwner(r.owner, chain: r.ethicsChain);
+    return (
+      owner: EthicsDb.displayName(r.owner, company),
+      score: company == null ? null : EthicsScore.compute(company).score,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -88,41 +127,43 @@ class _SearchHistoryViewState extends State<SearchHistoryView> {
     final List<Widget> children = <Widget>[];
     int i = 0;
 
-    if (widget.preloadedList.isNotEmpty) {
-      for (int k = 0; k < widget.preloadedList.length; k++) {
-        final SearchPreloadedItem item = widget.preloadedList[k];
-        children.add(
-          item.getWidget(
-            context,
-            onDismissItem: () async {
-              widget.preloadedList.removeAt(k);
-              await item.delete(context);
-              setState(() {});
-            },
-          ),
-        );
-      }
+    for (int k = 0; k < widget.preloadedList.length; k++) {
+      final SearchPreloadedItem item = widget.preloadedList[k];
+      children.add(
+        item.getWidget(
+          context,
+          onDismissItem: () async {
+            widget.preloadedList.removeAt(k);
+            await item.delete(context);
+            setState(() {});
+          },
+        ),
+      );
     }
 
     if (_queries.isNotEmpty) {
       children.add(
         Padding(
-          padding: const EdgeInsetsDirectional.only(top: 8.0, bottom: 10.0),
-          child: CalSectionTitle('Recent', action: 'Clear', onAction: () => unawaited(_clear())),
+          padding: const EdgeInsetsDirectional.only(top: 8.0, bottom: 12.0),
+          child: CalSectionTitle('Recently searched', action: 'Clear', onAction: () => unawaited(_clear())),
         ),
       );
-      for (final String q in _queries.take(12)) {
+      for (final String q in _queries.take(8)) {
         children.add(
           Padding(
-            key: ValueKey<String>(q),
-            padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+            key: ValueKey<String>('recent-$q'),
+            padding: const EdgeInsetsDirectional.only(bottom: 10.0),
             child: FadeUpIn(
               index: i++,
-              child: _RecentRow(
-                query: q,
+              child: _QueryRow(
+                title: q,
+                owner: products ? _ownerOf(q) : null,
+                leading: CupertinoIcons.clock,
                 onTap: () => widget.onTap(q),
-                onEdit: () => _edit(q),
-                onRemove: () => unawaited(_remove(q)),
+                onLongPress: () => _edit(q),
+                action: CupertinoIcons.xmark,
+                actionLabel: 'Remove $q from recent searches',
+                onAction: () => unawaited(_remove(q)),
               ),
             ),
           ),
@@ -133,33 +174,27 @@ class _SearchHistoryViewState extends State<SearchHistoryView> {
     if (products) {
       children.add(
         Padding(
-          padding: EdgeInsetsDirectional.only(top: _queries.isEmpty ? 8.0 : 22.0, bottom: 12.0),
-          child: const CalSectionTitle('Popular brands'),
+          padding: EdgeInsetsDirectional.only(top: _queries.isEmpty ? 8.0 : 20.0, bottom: 12.0),
+          child: const CalSectionTitle('Suggestions'),
         ),
       );
-      children.add(
-        FadeUpIn(
-          index: i++,
-          child: Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: <Widget>[
-              for (final String b in SearchHistoryView.popularBrands)
-                CalPill(label: b, onTap: () => widget.onTap(b)),
-            ],
-          ),
-        ),
-      );
-      if (_queries.isEmpty) {
+      for (final String b in SearchHistoryView.popularBrands) {
+        if (_queries.any((String q) => q.toLowerCase() == b.toLowerCase())) {
+          continue;
+        }
         children.add(
           Padding(
-            padding: const EdgeInsetsDirectional.only(top: 18.0),
-            child: Text(
-              'Type a brand to see who owns it, or a product name or barcode.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 15.0,
-                height: 1.35,
-                color: theme.colorScheme.onSurfaceVariant,
+            key: ValueKey<String>('suggest-$b'),
+            padding: const EdgeInsetsDirectional.only(bottom: 10.0),
+            child: FadeUpIn(
+              index: i++,
+              child: _QueryRow(
+                title: b,
+                owner: _ownerOf(b),
+                onTap: () => widget.onTap(b),
+                action: CupertinoIcons.arrow_right,
+                actionLabel: 'Who owns $b',
+                onAction: () => widget.onTap(b),
               ),
             ),
           ),
@@ -179,68 +214,101 @@ class _SearchHistoryViewState extends State<SearchHistoryView> {
 
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: EdgeInsetsDirectional.fromSTEB(
-        kCalSide,
-        4.0,
-        kCalSide,
-        MediaQuery.paddingOf(context).bottom + 120.0,
-      ),
+      padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 4.0, kCalSide, MediaQuery.paddingOf(context).bottom + 120.0),
       children: children,
     );
   }
 }
 
-/// One earlier search: a clock, the words, and × to forget it.
-class _RecentRow extends StatelessWidget {
-  const _RecentRow({required this.query, required this.onTap, required this.onEdit, required this.onRemove});
+/// Cal AI's food row: a bold name, a grey line under it (here the owner
+/// and its moral score), and a round button on the right.
+class _QueryRow extends StatelessWidget {
+  const _QueryRow({
+    required this.title,
+    required this.owner,
+    required this.onTap,
+    required this.action,
+    required this.actionLabel,
+    required this.onAction,
+    this.leading,
+    this.onLongPress,
+  });
 
-  final String query;
+  final String title;
+  final ({String owner, int? score})? owner;
+  final IconData? leading;
   final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onRemove;
+  final VoidCallback? onLongPress;
+  final IconData action;
+  final String actionLabel;
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color muted = theme.colorScheme.onSurfaceVariant;
+    final ({String owner, int? score})? o = owner;
     return Semantics(
       button: true,
-      label: 'Search again for $query',
-      onLongPressHint: 'Edit',
+      label: o == null ? 'Search for $title' : '$title, owned by ${o.owner}',
       child: PressScale(
         scale: 0.98,
         onTap: onTap,
-        onLongPress: onEdit,
+        onLongPress: onLongPress,
         child: Container(
-          height: 54.0,
-          padding: const EdgeInsetsDirectional.only(start: 16.0, end: 4.0),
+          constraints: const BoxConstraints(minHeight: 64.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(16.0, 11.0, 10.0, 11.0),
           decoration: calRowDecoration(context, radius: 16.0),
           child: Row(
             children: <Widget>[
-              Icon(CupertinoIcons.clock, size: 19.0, color: muted),
-              const SizedBox(width: 12.0),
               Expanded(
-                child: Text(
-                  query,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16.0, letterSpacing: -0.3),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 3.0),
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          o == null ? (leading ?? CupertinoIcons.search) : CupertinoIcons.building_2_fill,
+                          size: 13.0,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        const SizedBox(width: 5.0),
+                        Flexible(
+                          child: Text(
+                            o == null ? 'Search again' : o.owner,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),
+                          ),
+                        ),
+                        if (o?.score != null) ...<Widget>[
+                          Text(' · ', style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted)),
+                          Icon(Icons.balance_rounded, size: 12.0, color: theme.colorScheme.onSurface),
+                          const SizedBox(width: 3.0),
+                          Text(
+                            '${o!.score}',
+                            style: theme.textTheme.bodySmall?.copyWith(fontSize: 13.0, color: muted),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Semantics(
-                button: true,
-                label: 'Remove $query from recent searches',
-                excludeSemantics: true,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onRemove,
-                  child: SizedBox(
-                    width: 44.0,
-                    height: 44.0,
-                    child: Icon(CupertinoIcons.xmark, size: 15.0, color: muted),
-                  ),
-                ),
-              ),
+              const SizedBox(width: 8.0),
+              CalRoundButton(icon: action, tooltip: actionLabel, size: 32.0, onTap: onAction, onWhite: true),
             ],
           ),
         ),

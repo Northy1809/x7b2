@@ -99,70 +99,77 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final EdgeInsets pad = MediaQuery.paddingOf(context);
-    return Scaffold(
-      appBar: const CalTopBar(title: 'History'),
-      body: FutureBuilder<HomeSummary>(
-        future: _summary,
-        builder: (BuildContext context, AsyncSnapshot<HomeSummary> snap) {
-          final HomeSummary? s = snap.data;
-          if (s == null) {
-            return const Center(child: CalLoader());
-          }
-          final List<Product> products = <Product>[
-            for (final Product p in s.products)
-              if (!_removed.contains(p.barcode)) p,
-          ];
-          if (products.isEmpty) {
-            return const Center(
+  Widget build(BuildContext context) => FutureBuilder<HomeSummary>(
+    future: _summary,
+    builder: (BuildContext context, AsyncSnapshot<HomeSummary> snap) {
+      final HomeSummary? s = snap.data;
+      const String title = 'History';
+      if (s == null) {
+        return const CalPage(
+          title: title,
+          children: <Widget>[
+            Padding(padding: EdgeInsetsDirectional.only(top: 80.0), child: Center(child: CalLoader())),
+          ],
+        );
+      }
+      final List<Product> products = <Product>[
+        for (final Product p in s.products)
+          if (!_removed.contains(p.barcode)) p,
+      ];
+      if (products.isEmpty) {
+        return const CalPage(
+          title: title,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsetsDirectional.only(top: 60.0),
               child: CalEmpty(
                 icon: CupertinoIcons.viewfinder,
                 title: 'No scans yet',
                 body: 'Tap + and snap a product to see who really owns it.',
               ),
-            );
-          }
-          final List<Widget> children = <Widget>[];
-          String? lastDay;
-          int i = 0;
-          for (final Product p in products) {
-            final DateTime? seen = s.lastSeen[p.barcode];
-            final String day = _day(seen);
-            if (day != lastDay) {
-              children.add(
-                Padding(
-                  padding: EdgeInsetsDirectional.only(top: lastDay == null ? 4.0 : 18.0, bottom: 10.0),
-                  child: CalSectionTitle(day),
-                ),
-              );
-              lastDay = day;
-            }
-            children.add(
-              Padding(
-                key: ValueKey<String?>(p.barcode),
-                padding: const EdgeInsetsDirectional.only(bottom: 13.0),
-                child: FadeUpIn(
-                  index: i++,
-                  child: Dismissible(
-                    key: ValueKey<String>('dismiss-${p.barcode}'),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (_) => unawaited(_remove(p)),
-                    background: const _SwipeBackground(),
-                    child: ScanRow(product: p, owner: s.ownerOf(p), seen: seen),
-                  ),
-                ),
-              ),
-            );
-          }
-          return ListView(
-            padding: EdgeInsetsDirectional.fromSTEB(kCalSide, 8.0, kCalSide, pad.bottom + 32.0),
-            children: children,
+            ),
+          ],
+        );
+      }
+      final List<Widget> children = <Widget>[];
+      String? lastDay;
+      int i = 0;
+      for (final Product p in products) {
+        final DateTime? seen = s.lastSeen[p.barcode];
+        final String day = _day(seen);
+        if (day != lastDay) {
+          children.add(
+            Padding(
+              padding: EdgeInsetsDirectional.only(top: lastDay == null ? 0.0 : 18.0, bottom: 10.0),
+              child: CalSectionTitle(day),
+            ),
           );
-        },
-      ),
-    );
-  }
+          lastDay = day;
+        }
+        children.add(
+          Padding(
+            key: ValueKey<String?>(p.barcode),
+            padding: const EdgeInsetsDirectional.only(bottom: 13.0),
+            child: FadeUpIn(
+              index: i++,
+              child: Dismissible(
+                key: ValueKey<String>('dismiss-${p.barcode}'),
+                direction: DismissDirection.endToStart,
+                onDismissed: (_) => unawaited(_remove(p)),
+                background: const _SwipeBackground(),
+                child: ScanRow(product: p, owner: s.ownerOf(p), seen: seen),
+              ),
+            ),
+          ),
+        );
+      }
+      return CalPage(
+        title: title,
+        subtitle: '${products.length} ${products.length == 1 ? 'product' : 'products'} · swipe left to remove',
+        children: children,
+      );
+    },
+  );
 }
 
 /// What shows behind a row while it is swiped: a grey rounded block with a

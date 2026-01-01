@@ -4,9 +4,9 @@ import 'package:smooth_app/data_models/preferences/user_preferences.dart';
 import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/pages/navigator/app_navigator.dart';
 import 'package:smooth_app/pages/onboarding/owned_onboarding_pages.dart';
+import 'package:smooth_app/pages/onboarding/owned_setup_page.dart';
 import 'package:smooth_app/pages/onboarding/permissions_page.dart';
 import 'package:smooth_app/pages/onboarding/preferences_page.dart';
-import 'package:smooth_app/pages/onboarding/sample_eco_card_page.dart';
 import 'package:smooth_app/pages/onboarding/welcome_page.dart';
 import 'package:smooth_app/pages/page_manager.dart';
 import 'package:smooth_app/pages/scan/carousel/scan_carousel_manager.dart';
@@ -24,9 +24,11 @@ enum OnboardingPage {
   PERMISSIONS_PAGE,
   ONBOARDING_COMPLETE;
 
-  /// Owned's flow: intro -> country -> the two scores -> camera. OFF's
-  /// eco-card and food-preferences pages are skipped (their indexes stay,
-  /// because the last visited page is stored by index).
+  /// Owned's flow: intro -> country -> the two scores -> setting up (Cal
+  /// AI's percentage screen, in the old eco-card slot) -> camera. OFF's
+  /// food-preferences page is skipped (indexes stay, because the last
+  /// visited page is stored by index). Back from the camera skips the
+  /// setup screen.
   OnboardingPage getPrevPage() => switch (this) {
     NOT_STARTED || HOME_PAGE => NOT_STARTED,
     WELCOME => HOME_PAGE,
@@ -39,7 +41,8 @@ enum OnboardingPage {
     NOT_STARTED => HOME_PAGE,
     HOME_PAGE => WELCOME,
     WELCOME => HEALTH_CARD_EXAMPLE,
-    HEALTH_CARD_EXAMPLE || ECO_CARD_EXAMPLE || PREFERENCES_PAGE => PERMISSIONS_PAGE,
+    HEALTH_CARD_EXAMPLE => ECO_CARD_EXAMPLE,
+    ECO_CARD_EXAMPLE || PREFERENCES_PAGE => PERMISSIONS_PAGE,
     PERMISSIONS_PAGE || ONBOARDING_COMPLETE => ONBOARDING_COMPLETE,
   };
 
@@ -84,10 +87,7 @@ enum OnboardingPage {
           OwnedScoresIntroPage(backgroundColor),
         );
       case OnboardingPage.ECO_CARD_EXAMPLE:
-        return _wrapWidgetInCustomBackNavigator(
-          context,
-          SampleEcoCardPage(localDatabase, backgroundColor),
-        );
+        return _wrapWidgetInCustomBackNavigator(context, const OwnedSetupPage());
       case OnboardingPage.PREFERENCES_PAGE:
         return _wrapWidgetInCustomBackNavigator(
           context,

@@ -79,6 +79,7 @@ class OnboardingTopBar extends StatelessWidget {
     OnboardingPage.HOME_PAGE,
     OnboardingPage.WELCOME,
     OnboardingPage.HEALTH_CARD_EXAMPLE,
+    OnboardingPage.ECO_CARD_EXAMPLE,
     OnboardingPage.PERMISSIONS_PAGE,
   ];
 

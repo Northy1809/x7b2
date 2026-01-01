@@ -44,6 +44,7 @@ class CalRoundButton extends StatelessWidget {
     required this.onTap,
     required this.tooltip,
     this.size = 40.0,
+    this.onWhite = false,
     super.key,
   });
 
@@ -51,6 +52,9 @@ class CalRoundButton extends StatelessWidget {
   final VoidCallback? onTap;
   final String tooltip;
   final double size;
+
+  /// A white circle (on a grey row) instead of a grey one (on white).
+  final bool onWhite;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -63,7 +67,11 @@ class CalRoundButton extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(color: calFill(context), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: onWhite ? (_dark(context) ? BrandColors.cardDark : BrandColors.card) : calFill(context),
+          shape: BoxShape.circle,
+          border: onWhite ? Border.all(color: calHairline(context)) : null,
+        ),
         child: Icon(icon, size: size * 0.45, color: Theme.of(context).colorScheme.onSurface),
       ),
     ),
@@ -73,10 +81,21 @@ class CalRoundButton extends StatelessWidget {
 /// The top of a pushed page: round grey back arrow on the left, the title
 /// centred, an optional action on the right. White, no line under it.
 class CalTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const CalTopBar({this.title, this.trailing, this.onBack, this.showBack = true, super.key});
+  const CalTopBar({
+    this.title,
+    this.trailing,
+    this.onBack,
+    this.showBack = true,
+    this.titleVisible = true,
+    super.key,
+  });
 
   final String? title;
   final Widget? trailing;
+
+  /// False hides the small title (a [CalPage] shows it once its large title
+  /// has scrolled away).
+  final bool titleVisible;
 
   /// Defaults to closing the page.
   final VoidCallback? onBack;
@@ -109,19 +128,101 @@ class CalTopBar extends StatelessWidget implements PreferredSizeWidget {
                   : null,
               middle: title == null
                   ? null
-                  : Text(
-                      title!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.4,
+                  : AnimatedOpacity(
+                      opacity: titleVisible ? 1.0 : 0.0,
+                      duration: CalMotion.select * 2,
+                      child: Text(
+                        title!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.4,
+                        ),
                       ),
                     ),
               trailing: trailing,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A pushed page the Cal AI way ("Milestones", "Log Exercise"): the round
+/// back arrow on top, a big bold title on the left under it, then the
+/// content. Once the big title scrolls away, the small title fades in at
+/// the top, as on iOS.
+class CalPage extends StatefulWidget {
+  const CalPage({
+    required this.title,
+    required this.children,
+    this.subtitle,
+    this.trailing,
+    this.sidePadding = kCalSide,
+    super.key,
+  });
+
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final List<Widget> children;
+
+  /// Margin for [children]; 0 when they bring their own (OverviewCard).
+  final double sidePadding;
+
+  @override
+  State<CalPage> createState() => _CalPageState();
+}
+
+class _CalPageState extends State<CalPage> {
+  bool _small = false;
+
+  bool _onScroll(final ScrollNotification n) {
+    if (n.depth == 0) {
+      final bool small = n.metrics.pixels > 44.0;
+      if (small != _small) {
+        setState(() => _small = small);
+      }
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Scaffold(
+      appBar: CalTopBar(title: widget.title, titleVisible: _small, trailing: widget.trailing),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: _onScroll,
+        child: ListView(
+          padding: EdgeInsetsDirectional.only(bottom: MediaQuery.paddingOf(context).bottom + 40.0),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 4.0, kCalSide, 0.0),
+              child: FadeUpIn(child: CalLargeTitle(widget.title)),
+            ),
+            if (widget.subtitle != null)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(kCalSide, 6.0, kCalSide, 0.0),
+                child: Text(
+                  widget.subtitle!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 15.0,
+                    height: 1.35,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 18.0),
+            for (final Widget child in widget.children)
+              Padding(
+                padding: EdgeInsetsDirectional.symmetric(horizontal: widget.sidePadding),
+                child: child,
+              ),
+          ],
         ),
       ),
     );
@@ -763,3 +864,145 @@ Future<T?> showCalChoices<T>({
     ),
   ),
 );
+
+/// Cal AI's segmented control ("90 Days | 6 Months | 1 Year | All time"):
+/// a light grey track and a white pill that slides to the chosen segment.
+class CalSegmented<T> extends StatelessWidget {
+  const CalSegmented({required this.segments, required this.selected, required this.onChanged, super.key});
+
+  final List<(T, String)> segments;
+  final T selected;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final bool dark = _dark(context);
+    final int index = segments.indexWhere(((T, String) s) => s.$1 == selected).clamp(0, segments.length - 1);
+    return Container(
+      height: 38.0,
+      padding: const EdgeInsetsDirectional.all(3.0),
+      decoration: BoxDecoration(
+        color: dark ? BrandColors.fillDark : const Color(0xFFF1F0F5),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints c) {
+          final double w = c.maxWidth / segments.length;
+          return Stack(
+            children: <Widget>[
+              AnimatedPositionedDirectional(
+                duration: CalMotion.page,
+                curve: CalMotion.curve,
+                start: w * index,
+                top: 0.0,
+                bottom: 0.0,
+                width: w,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: dark ? BrandColors.cardDark : BrandColors.card,
+                    borderRadius: BorderRadius.circular(9.0),
+                    boxShadow: dark
+                        ? null
+                        : const <BoxShadow>[BoxShadow(color: Color(0x141E1A22), blurRadius: 6.0, offset: Offset(0.0, 1.0))],
+                  ),
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  for (final (T value, String label) in segments)
+                    Expanded(
+                      child: Semantics(
+                        button: true,
+                        selected: value == selected,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: value == selected
+                              ? null
+                              : () {
+                                  Haptics.select();
+                                  onChanged(value);
+                                },
+                          child: Center(
+                            child: AnimatedDefaultTextStyle(
+                              duration: CalMotion.select,
+                              style: (theme.textTheme.bodySmall ?? const TextStyle()).copyWith(
+                                fontSize: 13.0,
+                                fontWeight: value == selected ? FontWeight.w600 : FontWeight.w500,
+                                color: value == selected ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant,
+                              ),
+                              child: Text(label, maxLines: 1),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Cal AI's bar chart card body: ink bars with round tops that grow in,
+/// a light baseline, and a label under each bar. [values] may be empty.
+class CalBars extends StatelessWidget {
+  const CalBars({required this.values, required this.labels, this.height = 120.0, super.key});
+
+  final List<int> values;
+  final List<String> labels;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final int max = values.fold(0, (int a, int b) => b > a ? b : a);
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          height: height,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              for (int i = 0; i < values.length; i++)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.symmetric(horizontal: 5.0),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: max == 0 ? 0.0 : values[i] / max),
+                      duration: CalMotion.reduced(context) ? Duration.zero : CalMotion.fill,
+                      curve: CalMotion.curve,
+                      builder: (BuildContext context, double f, _) => Container(
+                        height: values[i] == 0 ? 3.0 : (height - 4.0) * f + 4.0,
+                        decoration: BoxDecoration(
+                          color: values[i] == 0 ? calHairline(context) : theme.colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Row(
+          children: <Widget>[
+            for (final String l in labels)
+              Expanded(
+                child: Text(
+                  l,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 11.0, color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}

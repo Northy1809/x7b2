@@ -201,24 +201,7 @@ class _LiveSearchSuggestionsState extends State<LiveSearchSuggestions> {
   /// The owner when the typed text is a brand the offline data knows
   /// ("kitkat" -> Nestlé); null for anything else, and when the owner only
   /// repeats the text (the company rows below cover that).
-  LocalOwnerResult? _brandOwner(final String text) {
-    final OwnershipLocalDb? db = _ownerDb;
-    final String key = OwnershipNorm.normCore(text);
-    if (db == null || key.length < 2 || !db.knowsBrand(key)) {
-      return null;
-    }
-    List<String> countries = const <String>[];
-    try {
-      countries = <String>[ProductQuery.getCountry().offTag];
-    } catch (_) {
-      // Country not chosen yet: the brand table still answers.
-    }
-    final LocalOwnerResult? hit = db.lookup(barcode: '', brands: text, countryTags: countries);
-    if (hit == null || OwnershipNorm.normCore(hit.owner) == key) {
-      return null;
-    }
-    return hit;
-  }
+  LocalOwnerResult? _brandOwner(final String text) => lookupBrandOwner(_ownerDb, text);
 
   Widget _build(final BuildContext context) {
     final List<SearchHit> products = _shownProducts;
@@ -398,6 +381,28 @@ class _SuggestionRowState extends State<_SuggestionRow> {
       ),
     );
   }
+}
+
+/// The owner of [text] when the offline data knows it as a brand
+/// ("kitkat" -> Nestlé), in the user's country when chosen. Null for
+/// anything else, and (unless [allowSame]) when the owner only repeats the
+/// text.
+LocalOwnerResult? lookupBrandOwner(final OwnershipLocalDb? db, final String text, {final bool allowSame = false}) {
+  final String key = OwnershipNorm.normCore(text);
+  if (db == null || key.length < 2 || !db.knowsBrand(key)) {
+    return null;
+  }
+  List<String> countries = const <String>[];
+  try {
+    countries = <String>[ProductQuery.getCountry().offTag];
+  } catch (_) {
+    // Country not chosen yet: the brand table still answers.
+  }
+  final LocalOwnerResult? hit = db.lookup(barcode: '', brands: text, countryTags: countries);
+  if (hit == null || (!allowSame && OwnershipNorm.normCore(hit.owner) == key)) {
+    return null;
+  }
+  return hit;
 }
 
 /// The instant answer at the top of the search when the text is a brand:

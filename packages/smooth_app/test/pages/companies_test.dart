@@ -78,6 +78,10 @@ void main() {
   });
 
   testWidgets('Companies tab: count, top 3 share and one row per company', (WidgetTester tester) async {
+    // A tall phone: the rows sit under the cards and the scans chart.
+    tester.view.physicalSize = const Size(1170, 4200);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(
       MaterialApp(
         home: CompaniesPage(
@@ -88,8 +92,9 @@ void main() {
       ),
     );
     await settle(tester);
-    expect(find.text('Companies behind your 3 products'), findsOneWidget);
-    expect(find.text('The top 3 make 100 %'), findsOneWidget);
+    expect(find.text('behind 3 products'), findsOneWidget);
+    expect(find.text('Top 3 make 100 %'), findsOneWidget);
+    expect(find.text('All time'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp(r'^Nestlé, 2 products, 67 percent')), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp(r'^Ferrero SpA, 1 products, 33 percent')), findsOneWidget);
     expect(find.text('Companies you avoid'), findsOneWidget);

@@ -341,16 +341,7 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CalTopBar(title: title),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          const SliverToBoxAdapter(child: SizedBox(height: 8.0)),
-          SliverToBoxAdapter(child: child),
-          const SliverToBoxAdapter(child: SizedBox(height: 40.0)),
-        ],
-      ),
-    );
+    return CalPage(title: title, sidePadding: 0.0, children: <Widget>[child]);
   }
 }
 

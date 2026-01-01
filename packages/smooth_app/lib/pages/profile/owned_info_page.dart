@@ -29,11 +29,11 @@ class OwnedInfoPage extends StatelessWidget {
   final OwnedInfoTopic topic;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: CalTopBar(title: topic.title),
-    body: ListView(
-      padding: const EdgeInsetsDirectional.symmetric(vertical: MEDIUM_SPACE),
-      children: switch (topic) {
+  Widget build(BuildContext context) => CalPage(
+    title: topic.title,
+    subtitle: topic.subtitle,
+    sidePadding: 0.0,
+    children: switch (topic) {
         OwnedInfoTopic.ownership => const <Widget>[
           _Block(
             title: 'The short version',
@@ -144,7 +144,6 @@ class OwnedInfoPage extends StatelessWidget {
           ),
         ],
       },
-    ),
   );
 }
 
