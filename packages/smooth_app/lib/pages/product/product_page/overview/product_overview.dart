@@ -9,7 +9,7 @@ import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/pages/owner/moral_score_page.dart';
 import 'package:smooth_app/pages/owner/owner_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/alternatives_section.dart';
-import 'package:smooth_app/pages/product/product_page/overview/health_details.dart';
+import 'package:smooth_app/pages/product/product_page/overview/health_score_page.dart';
 import 'package:smooth_app/pages/product/product_page/overview/owner_section.dart';
 import 'package:smooth_app/pages/product/product_page/overview/share_card.dart';
 import 'package:smooth_app/pages/product/product_page/tabs/ownership/ownership_provider.dart';
@@ -275,10 +275,11 @@ class _OverviewPageState extends State<_OverviewPage> {
                           ),
                     onHealthTap: !_showHealth
                         ? null
-                        : () => DetailsPage.open(
+                        : () => HealthScorePage.open(
                             context,
-                            'Health score',
-                            HealthDetails(result: health),
+                            result: health,
+                            productName: title,
+                            photo: _photo,
                           ),
                   ),
                   const SizedBox(height: 22.0),
