@@ -47,7 +47,7 @@ class PhotoAnalyzer {
     Future<String?> Function(String path)? prepare,
   }) : _prepare = prepare ?? uprightCopy,
        _readBarcode = readBarcode ?? bothReaders,
-       _enhancedRead = enhancedRead ?? BarcodeRescue.enhancedPasses,
+       _enhancedRead = enhancedRead,
        _localDb = localDb ?? OwnershipLocalDb.load,
        _packWords = packWords ?? BrandTextMatcher.loadPackWords,
        _online = online ?? OwnershipService().lookupWikidata;
@@ -58,7 +58,10 @@ class PhotoAnalyzer {
   final Future<OwnershipLocalDb> Function() _localDb;
   final Future<Set<String>> Function() _packWords;
   final Future<BrandOwnerResult?> Function(String brand) _online;
-  final Future<String?> Function(String path, Future<String?> Function(String path) read) _enhancedRead;
+  /// Extra reads of the photo when nothing was found. None by default: the
+  /// clearer passes (middle, band, contrast) are part of zxing-cpp's read
+  /// since 25/11, without writing image files.
+  final Future<String?> Function(String path, Future<String?> Function(String path) read)? _enhancedRead;
 
   /// Steps for the "analyzing" screen.
   static const List<String> steps = <String>[
@@ -79,12 +82,24 @@ class PhotoAnalyzer {
     // notes "turned" in the file, and the barcode reader ignores that) and
     // made a sensible size, read by everything below.
     final String work = await _safe(() => _prepare(path)) ?? path;
+    final int tUpright = watch.elapsedMilliseconds;
     // The pack is read even when a barcode is found: a barcode no database
     // knows still gets an answer from the brand on the photo (11/11 2026).
-    String? barcode = await _safe(() => _readBarcode(work));
+    // 25/11: both at the same time (they were one after the other).
+    int tBars = 0;
+    int tText = 0;
+    final Future<String?> bars = _safe(() => _readBarcode(work)).then((String? c) {
+      tBars = watch.elapsedMilliseconds - tUpright;
+      return c;
+    });
+    final Future<LabelText?> reading = _safe(() => ocr.readLines(work)).then((LabelText? t) {
+      tText = watch.elapsedMilliseconds - tUpright;
+      return t;
+    });
+    String? barcode = await bars;
     String how = barcode == null ? '' : 'bars';
     onStep?.call(1);
-    final LabelText text = await _safe(() => ocr.readLines(work)) ?? LabelText.empty;
+    final LabelText text = await reading ?? LabelText.empty;
     final List<String> lines = <String>[for (final PackTextLine l in text.lines) l.text];
     // 20/11: the bars were not readable (blur, glare, a curved pack); the
     // digits printed under them often are.
@@ -95,7 +110,8 @@ class PhotoAnalyzer {
     // 23/11: still none: the bars again on clearer versions of the photo,
     // while the brands are matched. Always, also with a brand on the front:
     // a guessed brand is worse than the product the barcode names.
-    final Future<String?>? rescue = barcode == null ? _safe(() => _enhancedRead(work, _readBarcode)) : null;
+    final Future<String?>? rescue =
+        barcode == null && _enhancedRead != null ? _safe(() => _enhancedRead(work, _readBarcode)) : null;
     onStep?.call(2);
     final OwnershipLocalDb? db = await _safe(_localDb);
     final List<BrandCandidate> found = <BrandCandidate>[];
@@ -124,10 +140,13 @@ class PhotoAnalyzer {
       barcode = await rescue;
       how = barcode == null ? 'none' : 'clearer';
     }
+    if (barcode == null) {
+      how = 'none';
+    }
     if (!identical(work, path)) {
       unawaited(_safe(() => File(work).delete()));
     }
-    lastRun = 'barcode=${barcode ?? '-'} via=$how brands=${found.length} lines=${lines.length} ms=${watch.elapsedMilliseconds}';
+    lastRun = 'barcode=${barcode ?? '-'} via=$how brands=${found.length} lines=${lines.length} ms=${watch.elapsedMilliseconds} upright=$tUpright bars=$tBars text=$tText';
     debugPrint('OWNED_SCAN $lastRun');
     if (found.isEmpty && barcode != null && db != null) {
       // The company that registered the barcode's GS1 prefix.
@@ -160,7 +179,7 @@ class PhotoAnalyzer {
       minWidth: 2400,
       minHeight: 2400,
       quality: 92,
-    ).timeout(const Duration(seconds: 6));
+    ).timeout(const Duration(seconds: 4));
     return out?.path;
   }
 
@@ -214,7 +233,7 @@ class PhotoAnalyzer {
       return phone.first;
     }
     final List<String> zxing = await _safe(
-          () => ZxingBarcodeReader.readFile(path).timeout(const Duration(seconds: 8)),
+          () => ZxingBarcodeReader.readFile(path).timeout(const Duration(seconds: 5)),
         ) ??
         const <String>[];
     for (final String code in phone) {
@@ -231,7 +250,7 @@ class PhotoAnalyzer {
   static Future<List<String>> _phoneBarcodes(final String path) async {
     final MobileScannerController controller = MobileScannerController(autoStart: false);
     try {
-      final BarcodeCapture? capture = await controller.analyzeImage(path).timeout(const Duration(seconds: 6));
+      final BarcodeCapture? capture = await controller.analyzeImage(path).timeout(const Duration(seconds: 4));
       return <String>{
         for (final Barcode b in capture?.barcodes ?? const <Barcode>[])
           if (Gs1Code.toProductCode(b.rawValue ?? b.displayValue ?? '') != null)

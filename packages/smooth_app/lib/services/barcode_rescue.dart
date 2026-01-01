@@ -1,7 +1,3 @@
-import 'dart:io';
-import 'dart:isolate';
-
-import 'package:image/image.dart' as img;
 import 'package:smooth_app/helpers/gs1_code.dart';
 
 /// Second and third chances for a barcode the camera could not read from
@@ -10,8 +6,8 @@ import 'package:smooth_app/helpers/gs1_code.dart';
 ///
 /// 1. [fromText]: the digits printed under the bars, as the text reader
 ///    saw them ("5 701234 567892"), when their GS1 check digit is right.
-/// 2. [enhancedPasses]: the photo again with stronger contrast, its middle
-///    enlarged and a band across the middle, each read for bars.
+/// (25/11: the clearer copies of the photo are now passes inside
+/// ZxingBarcodeReader, on grey pixels, without writing image files.)
 class BarcodeRescue {
   const BarcodeRescue._();
 
@@ -76,75 +72,5 @@ class BarcodeRescue {
         yield m.group(0)!;
       }
     }
-  }
-
-  /// Reads [path] again for bars, on images made clearer for it, and
-  /// returns the first product code [read] finds. The images are made in a
-  /// background isolate and deleted afterwards.
-  static Future<String?> enhancedPasses(final String path, final Future<String?> Function(String path) read) async {
-    final List<String> variants = await Isolate.run(() => makeVariants(path));
-    try {
-      for (final String v in variants) {
-        String? code;
-        try {
-          code = await read(v).timeout(const Duration(seconds: 4));
-        } catch (_) {
-          code = null;
-        }
-        if (code != null) {
-          return code;
-        }
-      }
-      return null;
-    } finally {
-      for (final String v in variants) {
-        try {
-          File(v).deleteSync();
-        } catch (_) {}
-      }
-    }
-  }
-
-  /// Writes the clearer images next to [path] and returns their paths:
-  /// the whole photo in grey with its contrast stretched, its middle 60 %
-  /// and a band across the middle (where a barcode usually is when
-  /// someone aims at it), both at full detail.
-  static List<String> makeVariants(final String path) {
-    final img.Image? decoded = img.decodeImage(File(path).readAsBytesSync());
-    if (decoded == null) {
-      return const <String>[];
-    }
-    img.Image base = img.bakeOrientation(decoded);
-    const int longSide = 3200;
-    if (base.width > longSide || base.height > longSide) {
-      base = base.width >= base.height
-          ? img.copyResize(base, width: longSide)
-          : img.copyResize(base, height: longSide);
-    }
-    img.Image clear(final img.Image i) => img.normalize(img.grayscale(img.Image.from(i)), min: 0, max: 255);
-    // Small crops are enlarged: the reader wants a few pixels per bar.
-    img.Image atLeast(final img.Image i, final int side) =>
-        i.width >= side ? i : img.copyResize(i, width: side, interpolation: img.Interpolation.cubic);
-
-    final int w = base.width;
-    final int h = base.height;
-    final img.Image whole = w >= h
-        ? (w > 2000 ? img.copyResize(base, width: 2000) : base)
-        : (h > 2000 ? img.copyResize(base, height: 2000) : base);
-    final img.Image middle = atLeast(
-      img.copyCrop(base, x: (w * 0.2).round(), y: (h * 0.2).round(), width: (w * 0.6).round(), height: (h * 0.6).round()),
-      1600,
-    );
-    final img.Image band = atLeast(img.copyCrop(base, x: 0, y: (h * 0.3).round(), width: w, height: (h * 0.4).round()), 1600);
-
-    final String stem = path.replaceFirst(RegExp(r'\.[^./\\]+$'), '');
-    final List<String> out = <String>[];
-    final List<img.Image> images = <img.Image>[clear(whole), clear(middle), clear(band)];
-    for (int i = 0; i < images.length; i++) {
-      final String p = '${stem}_rescue$i.jpg';
-      File(p).writeAsBytesSync(img.encodeJpg(images[i], quality: 92));
-      out.add(p);
-    }
-    return out;
   }
 }

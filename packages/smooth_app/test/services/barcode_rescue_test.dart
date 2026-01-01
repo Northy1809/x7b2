@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image/image.dart' as img;
 import 'package:smooth_app/services/barcode_rescue.dart';
 import 'package:smooth_app/services/brand_text_matcher.dart';
 import 'package:smooth_app/services/label_ocr.dart';
@@ -64,22 +61,6 @@ void main() {
       // 2 + 12 digits with a right check digit, but a shop's own code.
       expect(BarcodeRescue.fromText(<String>['2012345678903']), isNull);
     });
-  });
-
-  test('makeVariants writes three clearer images and they can be read', () async {
-    final Directory dir = await Directory.systemTemp.createTemp('rescue');
-    addTearDown(() => dir.delete(recursive: true));
-    final String path = '${dir.path}/photo.jpg';
-    final img.Image photo = img.Image(width: 2400, height: 1800);
-    img.fill(photo, color: img.ColorRgb8(120, 110, 100));
-    File(path).writeAsBytesSync(img.encodeJpg(photo));
-    final List<String> variants = BarcodeRescue.makeVariants(path);
-    expect(variants, hasLength(3));
-    for (final String v in variants) {
-      final img.Image? i = img.decodeImage(File(v).readAsBytesSync());
-      expect(i, isNotNull);
-      expect(i!.width <= 3200 && i.height <= 3200, isTrue);
-    }
   });
 
   group('PhotoAnalyzer with blurred bars', () {
