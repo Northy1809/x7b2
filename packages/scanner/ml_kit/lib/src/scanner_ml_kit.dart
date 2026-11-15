@@ -1,0 +1,359 @@
+import 'package:flutter/foundation.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+import 'package:scanner_shared/scanner_shared.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+
+/// Scanner implementation using ML Kit
+class ScannerMLKit extends Scanner {
+  const ScannerMLKit();
+
+  @override
+  String getType() => 'ML Kit';
+
+  @override
+  Widget getScanner({
+    required Future<bool> Function(String) onScan,
+    required Future<void> Function() hapticFeedback,
+    required Function(BuildContext)? onCameraFlashError,
+    required Function(
+      String msg,
+      String category, {
+      int? eventValue,
+      String? barcode,
+    })
+    trackCustomEvent,
+    required bool hasMoreThanOneCamera,
+    required Widget barcodeScannerIcon,
+    required Widget torchOnIcon,
+    required Widget torchOffIcon,
+    String? toggleCameraModeTooltip,
+    String? toggleFlashModeTooltip,
+    EdgeInsetsGeometry? contentPadding,
+    void Function(Uint8List image)? onImage,
+    bool showOverlay = true,
+    ScannerRemote? remote,
+  }) {
+    return _SmoothBarcodeScannerMLKit(
+      onScan: onScan,
+      hapticFeedback: hapticFeedback,
+      trackCustomEvent: trackCustomEvent,
+      onCameraFlashError: onCameraFlashError,
+      hasMoreThanOneCamera: hasMoreThanOneCamera,
+      toggleCameraModeTooltip: toggleCameraModeTooltip,
+      toggleFlashModeTooltip: toggleFlashModeTooltip,
+      barcodeScannerIcon: barcodeScannerIcon,
+      torchOnIcon: torchOnIcon,
+      torchOffIcon: torchOffIcon,
+      contentPadding: contentPadding,
+      onImage: onImage,
+      showOverlay: showOverlay,
+      remote: remote,
+    );
+  }
+}
+
+/// Barcode scanner based on MLKit.
+class _SmoothBarcodeScannerMLKit extends StatefulWidget {
+  const _SmoothBarcodeScannerMLKit({
+    required this.onScan,
+    required this.hapticFeedback,
+    required this.trackCustomEvent,
+    required this.onCameraFlashError,
+    required this.hasMoreThanOneCamera,
+    required this.barcodeScannerIcon,
+    required this.torchOnIcon,
+    required this.torchOffIcon,
+    this.toggleCameraModeTooltip,
+    this.toggleFlashModeTooltip,
+    this.contentPadding,
+    this.onImage,
+    this.showOverlay = true,
+    this.remote,
+  });
+
+  final Future<bool> Function(String) onScan;
+  final void Function(Uint8List image)? onImage;
+  final bool showOverlay;
+  final ScannerRemote? remote;
+  final Future<void> Function() hapticFeedback;
+
+  final Function(
+    String msg,
+    String category, {
+    int? eventValue,
+    String? barcode,
+  })
+  trackCustomEvent;
+  final Function(BuildContext)? onCameraFlashError;
+  final bool hasMoreThanOneCamera;
+
+  final Widget barcodeScannerIcon;
+  final Widget torchOnIcon;
+  final Widget torchOffIcon;
+
+  final EdgeInsetsGeometry? contentPadding;
+  final String? toggleCameraModeTooltip;
+  final String? toggleFlashModeTooltip;
+
+  @override
+  State<StatefulWidget> createState() => _SmoothBarcodeScannerMLKitState();
+}
+
+class _SmoothBarcodeScannerMLKitState extends State<_SmoothBarcodeScannerMLKit>
+    with SingleTickerProviderStateMixin {
+  static const List<BarcodeFormat> _barcodeFormats = <BarcodeFormat>[
+    BarcodeFormat.code39,
+    BarcodeFormat.code93,
+    BarcodeFormat.code128,
+    BarcodeFormat.ean8,
+    BarcodeFormat.ean13,
+    BarcodeFormat.itf14,
+    BarcodeFormat.upcA,
+    BarcodeFormat.upcE,
+    // 2D formats for GS1 Sunrise 2027
+    BarcodeFormat.dataMatrix,
+    BarcodeFormat.qrCode,
+  ];
+
+  static const ValueKey<String> _visibilityKey = ValueKey<String>(
+    'VisibilityDetector',
+  );
+
+  late CustomScannerController _cameraController;
+  late final AppLifecycleListener _lifecycleListener;
+  bool _screenVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _cameraController = CustomScannerController(
+      MobileScannerController(
+        autoStart: false,
+        torchEnabled: false,
+        formats: _barcodeFormats,
+        facing: CameraFacing.back,
+        detectionSpeed: DetectionSpeed.normal,
+        detectionTimeoutMs: 250,
+        // The frame is shown on the result page ("the photo you scanned").
+        // Only produced when a barcode is found, so the cost is one JPEG
+        // per scan.
+        returnImage: widget.onImage != null,
+      ),
+    );
+    _lifecycleListener = AppLifecycleListener(
+      onPause: _onPause,
+      onResume: _onResume,
+    );
+    widget.remote?.bind(toggleTorch: _cameraController.toggleTorch);
+    _cameraController.hasTorchState.addListener(_onTorchChanged);
+  }
+
+  void _onTorchChanged() {
+    final TorchState? state = _cameraController.hasTorchState.value;
+    widget.remote?.torch.value = state == null || state == TorchState.unavailable
+        ? null
+        : state == TorchState.on;
+  }
+
+  Future<void> _onResume() async {
+    if (_screenVisible) {
+      return _cameraController.start();
+    }
+  }
+
+  Future<void> _onPause() => _cameraController.stop();
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider<CustomScannerController>.value(
+      value: _cameraController,
+      child: VisibilityDetector(
+        key: _visibilityKey,
+        onVisibilityChanged: (final VisibilityInfo info) async {
+          _screenVisible = info.visibleFraction > 0;
+          _onScreenVisibilityChanged(_screenVisible);
+        },
+        child: Stack(
+          children: <Widget>[
+            MobileScanner(
+              controller: _cameraController.controller,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _) => SCANNER_EMPTY_WIDGET,
+              onDetect: (final BarcodeCapture capture) async {
+                final Uint8List? image = capture.image;
+                if (image != null && capture.barcodes.isNotEmpty) {
+                  widget.onImage?.call(image);
+                }
+                for (final Barcode barcode in capture.barcodes) {
+                  final String? string = barcode.displayValue;
+                  if (string != null) {
+                    await widget.onScan(string);
+                  }
+                }
+              },
+            ),
+            if (widget.showOverlay)
+            Center(
+              child: SmoothBarcodeScannerVisor(
+                icon: widget.barcodeScannerIcon,
+                contentPadding: widget.contentPadding,
+              ),
+            ),
+            if (widget.showOverlay)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsetsDirectional.all(
+                  SmoothBarcodeScannerVisor.CORNER_PADDING,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _ToggleCameraIcon(
+                      toggleCameraModeTooltip: widget.toggleCameraModeTooltip,
+                      hapticFeedback: widget.hapticFeedback,
+                    ),
+                    _TorchIcon(
+                      torchOnIcon: widget.torchOnIcon,
+                      torchOffIcon: widget.torchOffIcon,
+                      toggleFlashModeTooltip: widget.toggleFlashModeTooltip,
+                      hapticFeedback: widget.hapticFeedback,
+                      onCameraFlashError: widget.onCameraFlashError,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onScreenVisibilityChanged(bool visible) {
+    if (visible) {
+      _cameraController.start();
+    } else {
+      _cameraController.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraController.hasTorchState.removeListener(_onTorchChanged);
+    widget.remote?.unbind();
+    _lifecycleListener.dispose();
+    _cameraController.dispose();
+    super.dispose();
+  }
+}
+
+class _TorchIcon extends StatefulWidget {
+  const _TorchIcon({
+    required this.hapticFeedback,
+    required this.onCameraFlashError,
+    required this.torchOnIcon,
+    required this.torchOffIcon,
+    this.toggleFlashModeTooltip,
+  });
+
+  final Widget torchOnIcon;
+  final Widget torchOffIcon;
+
+  final String? toggleFlashModeTooltip;
+  final Future<void> Function() hapticFeedback;
+  final Function(BuildContext)? onCameraFlashError;
+
+  @override
+  State<_TorchIcon> createState() => _TorchIconState();
+}
+
+class _TorchIconState extends State<_TorchIcon> {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<TorchState?>(
+      valueListenable: context.watch<CustomScannerController>().hasTorchState,
+      builder: (BuildContext context, TorchState? hasTorch, _) {
+        if (hasTorch == null) {
+          return SCANNER_EMPTY_WIDGET;
+        }
+
+        final CustomScannerController controller = context
+            .watch<CustomScannerController>();
+        final bool isTorchOn = controller.isTorchOn;
+
+        return VisorButton(
+          tooltip:
+              widget.toggleFlashModeTooltip ??
+              'Turn ON or OFF the flash of the camera',
+          onTap: () async {
+            widget.hapticFeedback.call();
+
+            try {
+              context.read<CustomScannerController>().toggleTorch();
+            } catch (err) {
+              if (context.mounted) {
+                widget.onCameraFlashError?.call(context);
+              }
+            }
+          },
+          child: switch (isTorchOn) {
+            true => widget.torchOnIcon,
+            false => widget.torchOffIcon,
+          },
+        );
+      },
+    );
+  }
+}
+
+class _ToggleCameraIcon extends StatelessWidget {
+  const _ToggleCameraIcon({
+    required this.hapticFeedback,
+    this.toggleCameraModeTooltip,
+  });
+
+  final Future<void> Function() hapticFeedback;
+  final String? toggleCameraModeTooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final CustomScannerController controller = context
+        .watch<CustomScannerController>();
+
+    return ValueListenableBuilder<int>(
+      valueListenable: controller.availableCameras,
+      builder: (BuildContext context, int cameras, _) {
+        if (cameras <= 1) {
+          return SCANNER_EMPTY_WIDGET;
+        }
+
+        return VisorButton(
+          onTap: () async {
+            hapticFeedback.call();
+            controller.toggleCamera();
+          },
+          tooltip:
+              toggleCameraModeTooltip ?? 'Switch between back and front camera',
+          child: ValueListenableBuilder<CameraFacing>(
+            valueListenable: controller.cameraFacing,
+            builder: (BuildContext context, CameraFacing state, Widget? child) {
+              return switch (state) {
+                CameraFacing.front => const Icon(Icons.camera_front),
+                CameraFacing.back => const Icon(Icons.camera_rear),
+                CameraFacing.external => const Icon(Icons.camera_alt),
+                CameraFacing.unknown => const Icon(Icons.camera_alt),
+              };
+            },
+          ),
+        );
+      },
+    );
+  }
+}
