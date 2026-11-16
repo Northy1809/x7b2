@@ -292,6 +292,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'Owners',
         fraction: total == 0 ? null : s!.known / total,
         icon: CupertinoIcons.search,
+        color: BrandColors.accentRed,
       ),
       _SmallCard(
         value: top,
@@ -299,6 +300,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'From top 3',
         fraction: top == null ? null : top / 100,
         icon: CupertinoIcons.building_2_fill,
+        color: BrandColors.accentOrange,
       ),
       _SmallCard(
         value: s?.fromAvoided,
@@ -306,6 +308,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'Avoided',
         fraction: total == 0 ? null : s!.fromAvoided / total,
         icon: CupertinoIcons.nosign,
+        color: BrandColors.accentBlue,
       ),
     ];
   }
@@ -320,6 +323,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'Good or better',
         fraction: f(s?.healthGood),
         icon: CupertinoIcons.heart_fill,
+        color: BrandColors.accentRed,
       ),
       _SmallCard(
         value: s?.healthFair,
@@ -327,6 +331,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'Fair',
         fraction: f(s?.healthFair),
         icon: CupertinoIcons.heart_slash,
+        color: BrandColors.accentOrange,
       ),
       _SmallCard(
         value: s?.healthPoor,
@@ -334,6 +339,7 @@ class _OwnedHomePageState extends State<OwnedHomePage> {
         label: 'Poor',
         fraction: f(s?.healthPoor),
         icon: CupertinoIcons.exclamationmark_triangle,
+        color: BrandColors.accentBlue,
       ),
     ];
   }
@@ -639,6 +645,7 @@ class _SmallCard extends StatelessWidget {
     required this.label,
     required this.fraction,
     required this.icon,
+    this.color,
   });
 
   final int? value;
@@ -646,6 +653,9 @@ class _SmallCard extends StatelessWidget {
   final String label;
   final double? fraction;
   final IconData icon;
+
+  /// Ring and icon colour (Cal AI's red / orange / blue); ink when null.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -681,7 +691,8 @@ class _SmallCard extends StatelessWidget {
                 fraction: fraction,
                 size: _Spec.smallRing,
                 stroke: _Spec.smallStroke,
-                child: Icon(icon, size: 18.0, color: theme.colorScheme.onSurface),
+                color: color,
+                child: Icon(icon, size: 18.0, color: color ?? theme.colorScheme.onSurface),
               ),
             ),
           ],

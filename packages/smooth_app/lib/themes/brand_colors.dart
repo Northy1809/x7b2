@@ -38,6 +38,14 @@ class BrandColors {
   /// The selected tab's pill (Cal AI: #ECECEC).
   static const Color tabPill = Color(0xFFECECEC);
 
+  /// Cal AI's three accent colours: the protein / carbs / fats rings and
+  /// their small icons (calories stay ink). Owned uses them, in this order,
+  /// for the three small cards under every big one.
+  static const Color accentRed = Color(0xFFE5675E);
+  static const Color accentOrange = Color(0xFFE39A5B);
+  static const Color accentBlue = Color(0xFF5F8FE2);
+  static const List<Color> accents = <Color>[accentRed, accentOrange, accentBlue];
+
   /// The soft shadow under white cards on white.
   static const List<BoxShadow> cardShadow = <BoxShadow>[
     BoxShadow(color: Color(0x0F1E1A22), blurRadius: 24.0, offset: Offset(0.0, 6.0)),

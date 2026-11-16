@@ -104,10 +104,13 @@ class _RingPainter extends CustomPainter {
 
 /// Thin horizontal bar for a 0-100 sub-score.
 class ScoreBar extends StatelessWidget {
-  const ScoreBar({required this.score, this.height = 6.0});
+  const ScoreBar({required this.score, this.height = 6.0, this.color});
 
   final int score;
   final double height;
+
+  /// The filled part; ink when null.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -115,7 +118,7 @@ class ScoreBar extends StatelessWidget {
     child: LinearProgressIndicator(
       value: score / 100,
       minHeight: height,
-      color: Theme.of(context).colorScheme.onSurface,
+      color: color ?? Theme.of(context).colorScheme.onSurface,
       backgroundColor: Theme.of(context).brightness == Brightness.dark ? BrandColors.hairlineDark : BrandColors.hairline,
     ),
   );

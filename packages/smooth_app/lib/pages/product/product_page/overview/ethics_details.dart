@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/helpers/haptics.dart';
 import 'package:smooth_app/pages/product/product_page/overview/overview_card.dart';
 import 'package:smooth_app/pages/product/product_page/overview/score_ring.dart';
 import 'package:smooth_app/pages/product/product_page/overview/source_links.dart';
 import 'package:smooth_app/services/ethics_db.dart';
-import 'package:smooth_app/services/score_types.dart';
+import 'package:smooth_app/themes/brand_colors.dart';
+import 'package:smooth_app/widgets/cal_kit.dart';
+import 'package:smooth_app/widgets/cal_ui.dart';
 
 /// The "Ethics" section: the owner's score, per category, with every case
 /// and its sources one tap away.
@@ -44,7 +48,7 @@ class EthicsDetails extends StatelessWidget {
                         'products in the shops.',
               style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
             ),
-            FoldOut(title: 'How we rate companies', children: <Widget>[_MethodNote(db)]),
+            FoldOut(title: 'How we rate companies', children: <Widget>[EthicsMethodNote(db)]),
           ],
         ),
       );
@@ -80,25 +84,43 @@ class EthicsDetails extends StatelessWidget {
               ),
             )
           else
-            for (final EthicsCategoryScore c in r.categories) _CategoryBlock(c),
+            for (final EthicsCategoryScore c in r.categories) EthicsCategoryBlock(c),
           const SizedBox(height: SMALL_SPACE),
-          FoldOut(title: 'How we rate companies', children: <Widget>[_MethodNote(db)]),
+          FoldOut(title: 'How we rate companies', children: <Widget>[EthicsMethodNote(db)]),
         ],
       ),
     );
   }
 }
 
-class _CategoryBlock extends StatefulWidget {
-  const _CategoryBlock(this.category);
+/// Icon and Cal AI accent for each category, like Cal AI's protein (red),
+/// carbs (orange) and fats (blue).
+(IconData, Color) ethicsCategoryStyle(final EthicsCategory category) => switch (category) {
+  EthicsCategory.climate => (CupertinoIcons.globe, BrandColors.accentBlue),
+  EthicsCategory.people => (CupertinoIcons.person_2_fill, BrandColors.accentRed),
+  EthicsCategory.conduct => (CupertinoIcons.checkmark_shield_fill, BrandColors.accentOrange),
+};
+
+/// The short name for small cards: "Climate", "People", "Honesty".
+String ethicsCategoryShort(final EthicsCategory category) => switch (category) {
+  EthicsCategory.climate => 'Climate',
+  EthicsCategory.people => 'People',
+  EthicsCategory.conduct => 'Honesty',
+};
+
+/// One category: its icon, name and score over a coloured bar, then the
+/// worst cases as grey Cal rows (the rest one tap away).
+class EthicsCategoryBlock extends StatefulWidget {
+  const EthicsCategoryBlock(this.category, {this.topPadding = LARGE_SPACE, super.key});
 
   final EthicsCategoryScore category;
+  final double topPadding;
 
   @override
-  State<_CategoryBlock> createState() => _CategoryBlockState();
+  State<EthicsCategoryBlock> createState() => _EthicsCategoryBlockState();
 }
 
-class _CategoryBlockState extends State<_CategoryBlock> {
+class _EthicsCategoryBlockState extends State<EthicsCategoryBlock> {
   /// The worst cases first; the rest one tap away, so the section stays short.
   static const int _shown = 2;
   bool _expanded = false;
@@ -120,62 +142,102 @@ class _CategoryBlockState extends State<_CategoryBlock> {
   Widget build(BuildContext context) {
     final EthicsCategoryScore category = widget.category;
     final ThemeData theme = Theme.of(context);
+    final (IconData icon, Color color) = ethicsCategoryStyle(category.category);
     final List<EthicsItem> items = <EthicsItem>[
       ...category.issues,
       ...category.good,
       ...category.notes,
     ];
     return Padding(
-      padding: const EdgeInsetsDirectional.only(top: LARGE_SPACE),
+      padding: EdgeInsetsDirectional.only(top: widget.topPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             children: <Widget>[
+              Icon(icon, size: 18.0, color: color),
+              const SizedBox(width: 8.0),
               Expanded(
                 child: Text(
                   category.category.label,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, fontSize: 16.0),
                 ),
               ),
-              Text(
-                '${category.score}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: scoreTextColor(context, category.score),
+              Text.rich(
+                TextSpan(
+                  children: <InlineSpan>[
+                    TextSpan(text: '${category.score}'),
+                    TextSpan(
+                      text: '/100',
+                      style: TextStyle(fontSize: 12.0, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
                 ),
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
               ),
             ],
           ),
-          const SizedBox(height: 6.0),
-          ScoreBar(score: category.score),
-          const SizedBox(height: 4.0),
+          const SizedBox(height: 10.0),
+          ScoreBar(score: category.score, color: color),
+          const SizedBox(height: 8.0),
           Text(
             category.category.description,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontSize: 13.0),
           ),
           if (items.isEmpty)
             Padding(
-              padding: const EdgeInsetsDirectional.only(top: SMALL_SPACE),
-              child: Text(
-                'No documented cases found.',
-                style: theme.textTheme.bodyMedium,
-              ),
+              padding: const EdgeInsetsDirectional.only(top: 10.0),
+              child: Text('No documented cases found.', style: theme.textTheme.bodyMedium),
             )
           else ...<Widget>[
-            for (final EthicsItem item in _expanded ? items : items.take(_shown)) EthicsItemTile(item),
+            const SizedBox(height: 4.0),
+            AnimatedSize(
+              duration: CalMotion.page,
+              curve: CalMotion.curve,
+              alignment: AlignmentDirectional.topStart,
+              child: Column(
+                children: <Widget>[
+                  for (final EthicsItem item in _expanded ? items : items.take(_shown)) EthicsItemTile(item),
+                ],
+              ),
+            ),
             if (items.length > _shown)
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(padding: EdgeInsetsDirectional.zero),
-                  onPressed: () => setState(() => _expanded = !_expanded),
-                  icon: Icon(_expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded),
-                  label: Text(_expanded ? 'Show fewer' : moreLabel(items.sublist(_shown))),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(top: 8.0),
+                child: Semantics(
+                  button: true,
+                  child: PressScale(
+                    scale: 0.98,
+                    feedback: Haptics.select,
+                    onTap: () => setState(() => _expanded = !_expanded),
+                    child: Container(
+                      height: 46.0,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: calHairline(context)),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              _expanded ? 'Show fewer' : moreLabel(items.sublist(_shown)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 14.0),
+                            ),
+                          ),
+                          const SizedBox(width: 6.0),
+                          AnimatedRotation(
+                            turns: _expanded ? 0.5 : 0.0,
+                            duration: CalMotion.page,
+                            child: const Icon(CupertinoIcons.chevron_down, size: 14.0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -185,69 +247,156 @@ class _CategoryBlockState extends State<_CategoryBlock> {
   }
 }
 
-/// One case or practice; tap to read the details and open the sources.
+/// One case or practice as a grey Cal row; tap opens a sheet with the
+/// whole story and its sources.
 class EthicsItemTile extends StatelessWidget {
   const EthicsItemTile(this.item, {super.key});
 
   final EthicsItem item;
 
+  String get _meta => <String>[
+    item.severityLabel,
+    if (item.year != null && !item.isGood && !item.isNote) '${item.year}',
+  ].join(' · ');
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final bool dark = theme.brightness == Brightness.dark;
     final (IconData icon, Color color) = _style(item);
-    final String meta = <String>[
-      item.severityLabel,
-      if (item.year != null && !item.isGood && !item.isNote) '${item.year}',
-    ].join(' · ');
-    return Theme(
-      data: theme.copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: EdgeInsetsDirectional.zero,
-        childrenPadding: const EdgeInsetsDirectional.only(
-          start: 34.0,
-          bottom: MEDIUM_SPACE,
-        ),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        leading: Icon(icon, color: color, size: 22.0),
-        minTileHeight: 44.0,
-        title: Text(
-          item.title,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(top: 8.0),
+      child: Semantics(
+        button: true,
+        label: '${item.title}, $_meta',
+        excludeSemantics: true,
+        child: PressScale(
+          scale: 0.98,
+          feedback: Haptics.open,
+          onTap: () => showEthicsItemSheet(context, item),
+          child: Container(
+            padding: const EdgeInsetsDirectional.fromSTEB(12.0, 12.0, 12.0, 12.0),
+            decoration: BoxDecoration(
+              color: dark ? BrandColors.fillDark : BrandColors.row,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 36.0,
+                  height: 36.0,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
+                  child: Icon(icon, size: 18.0, color: color),
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        item.title,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, fontSize: 15.0, height: 1.25),
+                      ),
+                      const SizedBox(height: 3.0),
+                      Text(
+                        _meta,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 13.0,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Icon(CupertinoIcons.chevron_right, size: 16.0, color: theme.colorScheme.onSurfaceVariant),
+              ],
+            ),
           ),
         ),
-        subtitle: Text(
-          meta,
-          style: theme.textTheme.bodySmall?.copyWith(color: readableOn(color, theme.colorScheme.surface)),
-        ),
-        children: <Widget>[
-          if (item.text.isNotEmpty)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(bottom: SMALL_SPACE),
-              child: Text(
-                item.text,
-                style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
-              ),
-            ),
-          SourceLinks(item.sources, dense: true),
-        ],
       ),
     );
   }
 
   static (IconData, Color) _style(final EthicsItem item) {
     if (item.isGood) {
-      return (Icons.check_circle, ScoreBand.excellent.color);
+      return (CupertinoIcons.checkmark_alt, const Color(0xFF34A853));
     }
     if (item.isNote) {
-      return (Icons.info_outline, const Color(0xFF767676));
+      return (CupertinoIcons.info, const Color(0xFF767676));
     }
     return switch (item.severity) {
-      3 => (Icons.error, ScoreBand.bad.color),
-      2 => (Icons.warning_rounded, const Color(0xFF1E1A22)),
-      _ => (Icons.report_outlined, ScoreBand.mediocre.color),
+      3 => (CupertinoIcons.exclamationmark, BrandColors.accentRed),
+      2 => (CupertinoIcons.exclamationmark_triangle_fill, BrandColors.accentOrange),
+      _ => (CupertinoIcons.minus, const Color(0xFF767676)),
     };
   }
+}
+
+/// The whole case in a white sheet: icon and meta, the title big, the
+/// story, then its sources.
+Future<void> showEthicsItemSheet(final BuildContext context, final EthicsItem item) {
+  final (IconData icon, Color color) = EthicsItemTile._style(item);
+  final String meta = EthicsItemTile(item)._meta;
+  return showModalBottomSheet<void>(
+    context: context,
+    useRootNavigator: true,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      final ThemeData theme = Theme.of(context);
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.8),
+        child: SingleChildScrollView(
+          padding: EdgeInsetsDirectional.fromSTEB(
+            kCalSide,
+            0.0,
+            kCalSide,
+            MediaQuery.paddingOf(context).bottom + 24.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Container(
+                    width: 32.0,
+                    height: 32.0,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
+                    child: Icon(icon, size: 16.0, color: color),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Text(
+                    meta,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14.0),
+              Text(
+                item.title,
+                style: theme.textTheme.titleLarge?.copyWith(fontSize: 24.0, fontWeight: FontWeight.w700, letterSpacing: -0.5, height: 1.2),
+              ),
+              if (item.text.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 12.0),
+                Text(item.text, style: theme.textTheme.bodyLarge?.copyWith(height: 1.45, fontSize: 16.0)),
+              ],
+              if (item.sources.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 20.0),
+                const CalSectionTitle('Sources'),
+                const SizedBox(height: 8.0),
+                SourceLinks(item.sources),
+              ],
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 const List<String> _months = <String>[
@@ -260,8 +409,8 @@ String formatShortDate(final String iso) {
   return d == null ? iso : '${d.day} ${_months[d.month - 1]} ${d.year}';
 }
 
-class _MethodNote extends StatelessWidget {
-  const _MethodNote(this.db);
+class EthicsMethodNote extends StatelessWidget {
+  const EthicsMethodNote(this.db);
 
   final EthicsDb? db;
 
