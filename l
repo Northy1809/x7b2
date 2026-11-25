@@ -1,1 +1,1 @@
-https://owned-lens.supreme-naranja.workers.dev
+https://owned-lens.scarlet-carrot.workers.dev
